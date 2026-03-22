@@ -68,27 +68,27 @@ export default function Signin() {
   return (
     <div className='min-h-screen flex'>
       {/* Left Panel - Desktop only */}
-      <div className='hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-slate-900 relative overflow-hidden'>
+      <div className='hidden lg:flex lg:w-1/2 bg-gradient-to-br from-teal-600 via-teal-700 to-slate-900 relative overflow-hidden'>
         {/* Decorative shapes */}
         <div className='absolute top-0 left-0 w-full h-full'>
           <div className='absolute top-10 right-10 w-64 h-64 bg-white/5 rounded-full'></div>
           <div className='absolute top-32 right-32 w-40 h-40 bg-white/5 rounded-full'></div>
           <div className='absolute bottom-20 left-10 w-80 h-80 bg-white/5 rounded-full'></div>
-          <div className='absolute -bottom-20 right-20 w-60 h-60 bg-blue-400/10 rounded-full'></div>
+          <div className='absolute -bottom-20 right-20 w-60 h-60 bg-teal-400/10 rounded-full'></div>
         </div>
 
         <div className='relative flex flex-col items-center justify-center px-14 z-10 w-full text-center'>
           {/* Logo */}
           <h2 className='text-2xl font-bold mb-12'>
             <span className='text-white'>Kamankar</span>
-            <span className='text-blue-200'>Estate</span>
+            <span className='text-teal-200'>Estate</span>
           </h2>
 
           {/* Content */}
           <h1 className='text-4xl font-extrabold text-white leading-tight mb-4'>
             Welcome back to<br />your property journey
           </h1>
-          <p className='text-blue-100/70 text-base leading-relaxed max-w-md mb-12'>
+          <p className='text-teal-100/70 text-base leading-relaxed max-w-md mb-12'>
             Sign in to access your saved properties, manage your listings, and connect with property owners seamlessly.
           </p>
 
@@ -96,28 +96,36 @@ export default function Signin() {
           <div className='flex justify-center gap-10 pt-8 border-t border-white/10 w-full'>
             <div>
               <p className='text-2xl font-bold text-white'>200+</p>
-              <p className='text-blue-200/50 text-sm'>Properties</p>
+              <p className='text-teal-200/50 text-sm'>Properties</p>
             </div>
             <div>
               <p className='text-2xl font-bold text-white'>150+</p>
-              <p className='text-blue-200/50 text-sm'>Clients</p>
+              <p className='text-teal-200/50 text-sm'>Clients</p>
             </div>
             <div>
               <p className='text-2xl font-bold text-white'>50+</p>
-              <p className='text-blue-200/50 text-sm'>Cities</p>
+              <p className='text-teal-200/50 text-sm'>Cities</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Right Panel - Form */}
-      <div className='flex-1 flex items-center justify-center px-6 py-12 bg-gray-50'>
+      <div className='flex-1 flex flex-col bg-gray-50'>
+        {/* Top bar with Home link */}
+        <div className='flex justify-end px-6 pt-5'>
+          <Link to='/' className='text-sm font-medium text-gray-500 hover:text-teal-600 transition-colors'>
+            ← Back to Home
+          </Link>
+        </div>
+
+        <div className='flex-1 flex items-center justify-center px-6 py-8'>
         <div className='w-full max-w-[420px]'>
           {/* Mobile logo */}
           <div className='text-center mb-8 lg:hidden'>
             <h2 className='text-2xl font-bold'>
               <span className='text-slate-800'>Kamankar</span>
-              <span className='text-blue-600'>Estate</span>
+              <span className='text-teal-600'>Estate</span>
             </h2>
           </div>
 
@@ -128,17 +136,17 @@ export default function Signin() {
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1.5'>Email <span className='text-red-400'>*</span></label>
               <input type="email" placeholder='Enter your email'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors bg-white' id='email' onChange={handleChange}/>
+                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors bg-white' id='email' onChange={handleChange}/>
             </div>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1.5'>Password <span className='text-red-400'>*</span></label>
               <input type="password" placeholder='Enter your password'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors bg-white' id='password' onChange={handleChange}/>
+                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors bg-white' id='password' onChange={handleChange}/>
             </div>
 
             <button
               disabled={loading}
-              className='w-full py-3 text-white font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm mt-2'
+              className='w-full py-3 text-white font-semibold rounded-xl bg-teal-600 hover:bg-teal-700 transition-colors disabled:opacity-50 text-sm mt-2'
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -154,10 +162,11 @@ export default function Signin() {
 
           <p className='text-center text-sm text-gray-500 mt-8'>
             Don't have an account?{' '}
-            <Link to="/sign-Up" className='font-semibold text-blue-600 hover:text-blue-800 transition-colors'>
+            <Link to="/sign-Up" className='font-semibold text-teal-600 hover:text-teal-800 transition-colors'>
               Create account
             </Link>
           </p>
+        </div>
         </div>
       </div>
     </div>

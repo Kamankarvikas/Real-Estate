@@ -4,6 +4,7 @@ import {app} from '../firebase';
 import { useDispatch } from 'react-redux';
 import {signInSuccess} from '../redux/user/userSlice'
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 export default function OAuth() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -25,9 +26,11 @@ export default function OAuth() {
           });
           const data = await res.json();
           dispatch(signInSuccess(data));
+          toast.success('Login successful! Welcome to Kamankar Estate');
         navigate('/');
         }catch(error){
             console.log("could not sign with error ",error);
+            toast.error('Google sign in failed. Please try again.');
         }
     }
   return (

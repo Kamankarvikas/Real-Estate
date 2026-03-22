@@ -75,7 +75,7 @@ export default function Signout() {
   return (
     <div className='min-h-screen flex'>
       {/* Left Panel - Desktop only */}
-      <div className='hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-700 to-slate-900 relative overflow-hidden'>
+      <div className='hidden lg:flex lg:w-1/2 bg-gradient-to-br from-teal-600 via-teal-700 to-teal-900 relative overflow-hidden'>
         {/* Decorative shapes */}
         <div className='absolute top-0 left-0 w-full h-full'>
           <div className='absolute top-10 left-10 w-64 h-64 bg-white/5 rounded-full'></div>
@@ -130,13 +130,21 @@ export default function Signout() {
       </div>
 
       {/* Right Panel - Form */}
-      <div className='flex-1 flex items-center justify-center px-6 py-12 bg-gray-50'>
+      <div className='flex-1 flex flex-col bg-gray-50'>
+        {/* Top bar with Home link */}
+        <div className='flex justify-end px-6 pt-5'>
+          <Link to='/' className='text-sm font-medium text-gray-500 hover:text-teal-600 transition-colors'>
+            ← Back to Home
+          </Link>
+        </div>
+
+        <div className='flex-1 flex items-center justify-center px-6 py-8'>
         <div className='w-full max-w-[420px]'>
           {/* Mobile logo */}
           <div className='text-center mb-8 lg:hidden'>
             <h2 className='text-2xl font-bold'>
               <span className='text-slate-800'>Kamankar</span>
-              <span className='text-blue-600'>Estate</span>
+              <span className='text-teal-600'>Estate</span>
             </h2>
           </div>
 
@@ -149,7 +157,7 @@ export default function Signout() {
               <input
                 type='text'
                 placeholder='Enter your full name'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors bg-white'
+                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors bg-white'
                 id='username'
                 onChange={handleChange}
               />
@@ -157,17 +165,17 @@ export default function Signout() {
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1.5'>Email <span className='text-red-400'>*</span></label>
               <input type="email" placeholder='Enter your email'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors bg-white' id='email' onChange={handleChange}/>
+                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors bg-white' id='email' onChange={handleChange}/>
             </div>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1.5'>Password <span className='text-red-400'>*</span></label>
               <input type="password" placeholder='Enter your password'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors bg-white' id='password' onChange={handleChange}/>
+                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors bg-white' id='password' onChange={handleChange}/>
             </div>
 
             <button
               disabled={loading}
-              className='w-full py-3 text-white font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm mt-2'
+              className='w-full py-3 text-white font-semibold rounded-xl bg-teal-600 hover:bg-teal-700 transition-colors disabled:opacity-50 text-sm mt-2'
             >
               {loading ? 'Creating account...' : 'Create Account'}
             </button>
@@ -183,10 +191,11 @@ export default function Signout() {
 
           <p className='text-center text-sm text-gray-500 mt-8'>
             Already have an account?{' '}
-            <Link to="/sign-in" className='font-semibold text-blue-600 hover:text-blue-800 transition-colors'>
+            <Link to="/sign-in" className='font-semibold text-teal-600 hover:text-teal-800 transition-colors'>
               Sign in
             </Link>
           </p>
+        </div>
         </div>
       </div>
     </div>

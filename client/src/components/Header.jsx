@@ -34,14 +34,14 @@ export default function Header() {
         <Link to='/' className='flex-shrink-0'>
           <h1 className='text-base sm:text-xl font-bold'>
             <span className='text-slate-800'>Kamankar</span>
-            <span className='text-blue-600'>Estate</span>
+            <span className='text-teal-600'>Estate</span>
           </h1>
         </Link>
 
         {/* Search bar */}
         <form
           onSubmit={handleSubmit}
-          className='hidden sm:flex items-center flex-1 max-w-md mx-4 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 focus-within:border-blue-400 transition-colors'
+          className='hidden sm:flex items-center flex-1 max-w-md mx-4 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 focus-within:border-teal-400 transition-colors'
         >
           <input
             type='text'
@@ -57,10 +57,10 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className='hidden sm:flex items-center gap-4 flex-shrink-0'>
-          <Link to='/' className='text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors'>
+          <Link to='/' className='text-sm font-medium text-gray-600 hover:text-teal-600 transition-colors'>
             Home
           </Link>
-          <Link to='/about' className='text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors'>
+          <Link to='/about' className='text-sm font-medium text-gray-600 hover:text-teal-600 transition-colors'>
             About
           </Link>
           <Link to='/profile'>
@@ -71,7 +71,7 @@ export default function Header() {
                 alt='profile'
               />
             ) : (
-              <span className='text-sm font-semibold text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap'>
+              <span className='text-sm font-semibold text-white bg-teal-600 px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors whitespace-nowrap'>
                 Sign in
               </span>
             )}

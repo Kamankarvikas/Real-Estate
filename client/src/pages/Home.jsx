@@ -101,14 +101,14 @@ export default function Home() {
   return (
     <div>
       {/* ========== HERO ========== */}
-      <div className='bg-slate-900 text-white'>
+      <div className='bg-teal-900 text-white'>
         <div className='max-w-6xl mx-auto px-6 py-24 lg:py-32'>
-          <p className='text-blue-400 text-sm font-semibold uppercase tracking-widest mb-4 hero-animate hero-delay-1'>
+          <p className='text-teal-400 text-sm font-semibold uppercase tracking-widest mb-4 hero-animate hero-delay-1'>
             <span className='typing-animation'>Welcome to Kamankar Estate</span>
           </p>
           <h1 className='text-4xl lg:text-6xl font-extrabold leading-tight mb-6 hero-animate hero-delay-2'>
             Find your next<br />
-            <span className='text-blue-400'>perfect place</span>
+            <span className='text-teal-400'>perfect place</span>
           </h1>
           <p className='text-slate-400 text-base sm:text-lg max-w-xl mb-10 leading-relaxed hero-animate hero-delay-3'>
             Discover the ideal property that matches your lifestyle. Whether
@@ -117,14 +117,14 @@ export default function Home() {
           <div className='hero-animate hero-delay-4'>
             <Link
               to='/search'
-              className='inline-block bg-blue-600 text-white font-semibold px-8 py-3.5 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base'
+              className='inline-block bg-teal-600 text-white font-semibold px-8 py-3.5 rounded-lg hover:bg-teal-700 transition-colors text-sm sm:text-base'
             >
               Browse Properties
             </Link>
           </div>
 
           {/* Stats row with count-up */}
-          <div className='grid grid-cols-3 gap-8 mt-16 pt-10 border-t border-slate-700/50 max-w-lg hero-animate hero-delay-5'>
+          <div className='grid grid-cols-3 gap-8 mt-16 pt-10 border-t border-teal-700/50 max-w-lg hero-animate hero-delay-5'>
             <div ref={stat1.ref}>
               <p className='text-2xl lg:text-3xl font-bold'>{stat1.count}+</p>
               <p className='text-slate-400 text-sm mt-1'>Properties</p>
@@ -183,16 +183,16 @@ export default function Home() {
       <div className='bg-white'>
         <div className='max-w-6xl mx-auto px-6 py-20'>
           <div className='text-center mb-14'>
-            <p className='text-blue-600 text-xs font-semibold uppercase tracking-widest mb-2'>Simple Process</p>
+            <p className='text-teal-600 text-xs font-semibold uppercase tracking-widest mb-2'>Simple Process</p>
             <h2 className='text-2xl lg:text-3xl font-bold text-slate-800'>How It Works</h2>
           </div>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
             {/* Step 1 */}
             <div className='text-center px-4'>
-              <div className='w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-5'>
-                <FaSearch className='text-blue-600 text-xl' />
+              <div className='w-16 h-16 bg-teal-50 rounded-2xl flex items-center justify-center mx-auto mb-5'>
+                <FaSearch className='text-teal-600 text-xl' />
               </div>
-              <div className='w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-sm font-bold'>1</div>
+              <div className='w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-sm font-bold'>1</div>
               <h3 className='font-bold text-slate-800 text-lg mb-2'>Search Property</h3>
               <p className='text-gray-500 text-sm leading-relaxed'>
                 Browse through our wide range of properties. Filter by location, price, type, and amenities to find what suits you.
@@ -231,8 +231,8 @@ export default function Home() {
           {/* Empty state when no listings load */}
           {loadingDone && !hasListings && (
             <div className='text-center py-16'>
-              <div className='w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6'>
-                <FaHome className='text-blue-400 text-4xl' />
+              <div className='w-24 h-24 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-6'>
+                <FaHome className='text-teal-400 text-4xl' />
               </div>
               <h3 className='text-2xl font-bold text-slate-800 mb-3'>No Properties Available Right Now</h3>
               <p className='text-gray-500 max-w-md mx-auto mb-8 leading-relaxed'>
@@ -241,7 +241,7 @@ export default function Home() {
               <div className='flex flex-col sm:flex-row gap-3 justify-center'>
                 <Link
                   to='/search'
-                  className='inline-block bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors text-sm'
+                  className='inline-block bg-teal-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-teal-700 transition-colors text-sm'
                 >
                   Search Properties
                 </Link>
@@ -259,10 +259,10 @@ export default function Home() {
             <div className='mb-16'>
               <div className='flex items-end justify-between mb-6'>
                 <div>
-                  <p className='text-blue-600 text-xs font-semibold uppercase tracking-widest mb-1'>Special Deals</p>
+                  <p className='text-teal-600 text-xs font-semibold uppercase tracking-widest mb-1'>Special Deals</p>
                   <h2 className='text-2xl font-bold text-slate-800'>Recent Offers</h2>
                 </div>
-                <Link className='text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors hidden sm:block' to={'/search?offer=true'}>
+                <Link className='text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors hidden sm:block' to={'/search?offer=true'}>
                   View all →
                 </Link>
               </div>
@@ -278,10 +278,10 @@ export default function Home() {
             <div className='mb-16'>
               <div className='flex items-end justify-between mb-6'>
                 <div>
-                  <p className='text-blue-600 text-xs font-semibold uppercase tracking-widest mb-1'>For Rent</p>
+                  <p className='text-teal-600 text-xs font-semibold uppercase tracking-widest mb-1'>For Rent</p>
                   <h2 className='text-2xl font-bold text-slate-800'>Places for Rent</h2>
                 </div>
-                <Link className='text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors hidden sm:block' to={'/search?type=rent'}>
+                <Link className='text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors hidden sm:block' to={'/search?type=rent'}>
                   View all →
                 </Link>
               </div>
@@ -297,10 +297,10 @@ export default function Home() {
             <div>
               <div className='flex items-end justify-between mb-6'>
                 <div>
-                  <p className='text-blue-600 text-xs font-semibold uppercase tracking-widest mb-1'>For Sale</p>
+                  <p className='text-teal-600 text-xs font-semibold uppercase tracking-widest mb-1'>For Sale</p>
                   <h2 className='text-2xl font-bold text-slate-800'>Places for Sale</h2>
                 </div>
-                <Link className='text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors hidden sm:block' to={'/search?type=sale'}>
+                <Link className='text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors hidden sm:block' to={'/search?type=sale'}>
                   View all →
                 </Link>
               </div>
@@ -315,7 +315,7 @@ export default function Home() {
       </div>
 
       {/* ========== CTA BANNER ========== */}
-      <div className='bg-slate-900'>
+      <div className='bg-teal-900'>
         <div className='max-w-6xl mx-auto px-6 py-20 text-center'>
           <h2 className='text-3xl lg:text-4xl font-extrabold text-white mb-4'>
             Ready to Find Your Dream Home?
@@ -326,7 +326,7 @@ export default function Home() {
           <div className='flex flex-col sm:flex-row gap-4 justify-center'>
             <Link
               to='/search'
-              className='inline-block bg-blue-600 text-white font-semibold px-10 py-4 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base'
+              className='inline-block bg-teal-600 text-white font-semibold px-10 py-4 rounded-lg hover:bg-teal-700 transition-colors text-sm sm:text-base'
             >
               Explore Properties
             </Link>

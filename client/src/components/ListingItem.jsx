@@ -20,7 +20,7 @@ export default function ListingItem({ listing }) {
           ></div>
           {/* Type badge */}
           <div className='absolute top-3 left-3'>
-            <span className={`text-xs font-semibold px-3 py-1 rounded-full text-white shadow-sm ${listing.type === 'rent' ? 'bg-blue-600' : 'bg-emerald-600'}`}>
+            <span className={`text-xs font-semibold px-3 py-1 rounded-full text-white shadow-sm ${listing.type === 'rent' ? 'bg-teal-600' : 'bg-emerald-600'}`}>
               {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
             </span>
           </div>
@@ -53,7 +53,7 @@ export default function ListingItem({ listing }) {
 
           {/* Location */}
           <div className='flex items-center gap-1 mb-2'>
-            <MdLocationOn className='h-3.5 w-3.5 text-blue-500 flex-shrink-0' />
+            <MdLocationOn className='h-3.5 w-3.5 text-teal-500 flex-shrink-0' />
             <p className='text-xs text-gray-500 truncate'>
               {listing.address}
             </p>
@@ -67,13 +67,13 @@ export default function ListingItem({ listing }) {
           {/* Beds / Baths - pushed to bottom */}
           <div className='flex gap-4 mt-auto pt-3 border-t border-gray-100'>
             <div className='flex items-center gap-1.5'>
-              <FaBed className='text-xs text-blue-500' />
+              <FaBed className='text-xs text-teal-500' />
               <span className='text-xs font-semibold text-gray-500'>
                 {listing.bedrooms || 0} {(listing.bedrooms || 0) > 1 ? 'Beds' : 'Bed'}
               </span>
             </div>
             <div className='flex items-center gap-1.5'>
-              <FaBath className='text-xs text-blue-500' />
+              <FaBath className='text-xs text-teal-500' />
               <span className='text-xs font-semibold text-gray-500'>
                 {listing.bathrooms || 0} {(listing.bathrooms || 0) > 1 ? 'Baths' : 'Bath'}
               </span>

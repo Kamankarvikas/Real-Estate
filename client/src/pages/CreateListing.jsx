@@ -8,6 +8,7 @@ import {
 import { app } from '../firebase';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
@@ -125,11 +126,28 @@ export default function CreateListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Validation
+    if (!formData.name || formData.name.trim().length < 10) {
+      toast.error('Property name must be at least 10 characters');
+      return;
+    }
+    if (!formData.description || !formData.description.trim()) {
+      toast.error('Please enter a property description');
+      return;
+    }
+    if (!formData.address || !formData.address.trim()) {
+      toast.error('Please enter the property address');
+      return;
+    }
+    if (formData.imageUrls.length < 1) {
+      toast.error('You must upload at least one image');
+      return;
+    }
+    if (+formData.regularPrice < +formData.discountPrice) {
+      toast.error('Discount price must be lower than regular price');
+      return;
+    }
     try {
-      if (formData.imageUrls.length < 1)
-        return setError('You must upload at least one image');
-      if (+formData.regularPrice < +formData.discountPrice)
-        return setError('Discount price must be lower than regular price');
       setLoading(true);
       setError(false);
       const res = await fetch('/api/listing/create', {
@@ -146,11 +164,15 @@ export default function CreateListing() {
       setLoading(false);
       if (data.success === false) {
         setError(data.message);
+        toast.error(data.message || 'Failed to create listing');
+      } else {
+        toast.success('Listing created successfully!');
+        navigate(`/listing/${data._id}`);
       }
-      navigate(`/listing/${data._id}`);
     } catch (error) {
       setError(error.message);
       setLoading(false);
+      toast.error('Something went wrong. Please try again.');
     }
   };
   return (
@@ -169,38 +191,38 @@ export default function CreateListing() {
             <div className='bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4'>
               <h3 className='font-bold text-slate-800'>Property Details</h3>
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Property Name</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Property Name <span className='text-red-400'>*</span></label>
                 <input
                   type='text'
                   placeholder='e.g. Modern 3BHK Apartment'
-                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors'
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
                   id='name'
-                  maxLength='62'
-                  minLength='10'
-                  required
+                  
+                  
+                  
                   onChange={handleChange}
                   value={formData.name}
                 />
               </div>
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Description</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Description <span className='text-red-400'>*</span></label>
                 <textarea
                   placeholder='Describe your property in detail...'
-                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors min-h-[120px] resize-none'
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors min-h-[120px] resize-none'
                   id='description'
-                  required
+                  
                   onChange={handleChange}
                   value={formData.description}
                 />
               </div>
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Address</label>
+                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Address <span className='text-red-400'>*</span></label>
                 <input
                   type='text'
                   placeholder='Full property address'
-                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors'
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
                   id='address'
-                  required
+                  
                   onChange={handleChange}
                   value={formData.address}
                 />
@@ -212,10 +234,10 @@ export default function CreateListing() {
               <h3 className='font-bold text-slate-800'>Type & Features</h3>
 
               <div>
-                <label className='block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3'>Listing Type</label>
+                <label className='block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3'>Listing Type <span className='text-red-400'>*</span></label>
                 <div className='flex gap-3'>
                   {['sale', 'rent'].map((type) => (
-                    <label key={type} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 cursor-pointer text-sm font-medium transition-all ${formData.type === type ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
+                    <label key={type} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 cursor-pointer text-sm font-medium transition-all ${formData.type === type ? 'border-teal-500 bg-teal-50 text-teal-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
                       <input type='checkbox' id={type} className='sr-only' onChange={handleChange} checked={formData.type === type} />
                       {type === 'sale' ? 'For Sale' : 'For Rent'}
                     </label>
@@ -231,7 +253,7 @@ export default function CreateListing() {
                     { id: 'furnished', label: 'Furnished' },
                     { id: 'offer', label: 'Special Offer' },
                   ].map((item) => (
-                    <label key={item.id} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border cursor-pointer text-sm transition-all ${formData[item.id] ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
+                    <label key={item.id} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border cursor-pointer text-sm transition-all ${formData[item.id] ? 'border-teal-500 bg-teal-50 text-teal-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
                       <input type='checkbox' id={item.id} className='sr-only' onChange={handleChange} checked={formData[item.id]} />
                       {item.label}
                     </label>
@@ -241,21 +263,21 @@ export default function CreateListing() {
 
               <div className='grid grid-cols-2 sm:grid-cols-4 gap-4'>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Beds</label>
-                  <input type='number' id='bedrooms' min='1' max='10' required className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400' onChange={handleChange} value={formData.bedrooms} />
+                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Beds <span className='text-red-400'>*</span></label>
+                  <input type='number' id='bedrooms'    className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-400' onChange={handleChange} value={formData.bedrooms} />
                 </div>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Baths</label>
-                  <input type='number' id='bathrooms' min='1' max='10' required className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400' onChange={handleChange} value={formData.bathrooms} />
+                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Baths <span className='text-red-400'>*</span></label>
+                  <input type='number' id='bathrooms'    className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-400' onChange={handleChange} value={formData.bathrooms} />
                 </div>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Price {formData.type === 'rent' ? '($/mo)' : '($)'}</label>
-                  <input type='number' id='regularPrice' min='50' max='10000000' required className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400' onChange={handleChange} value={formData.regularPrice} />
+                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Price {formData.type === 'rent' ? '($/mo)' : '($)'} <span className='text-red-400'>*</span></label>
+                  <input type='number' id='regularPrice'    className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-400' onChange={handleChange} value={formData.regularPrice} />
                 </div>
                 {formData.offer && (
                   <div>
                     <label className='block text-sm font-medium text-gray-700 mb-1.5'>Discount {formData.type === 'rent' ? '($/mo)' : '($)'}</label>
-                    <input type='number' id='discountPrice' min='0' max='10000000' required className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400' onChange={handleChange} value={formData.discountPrice} />
+                    <input type='number' id='discountPrice'    className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-400' onChange={handleChange} value={formData.discountPrice} />
                   </div>
                 )}
               </div>
@@ -269,7 +291,7 @@ export default function CreateListing() {
               <h3 className='font-bold text-slate-800 mb-1'>Photos</h3>
               <p className='text-sm text-gray-400 mb-5'>First image is the cover. Max 6 images.</p>
 
-              <div className='border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-blue-300 transition-colors'>
+              <div className='border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-teal-300 transition-colors'>
                 <input onChange={(e) => setFiles(e.target.files)} className='hidden' type='file' id='images' accept='image/*' multiple />
                 <label htmlFor='images' className='cursor-pointer'>
                   <svg className='w-10 h-10 text-gray-300 mx-auto mb-3' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' /></svg>
@@ -282,7 +304,7 @@ export default function CreateListing() {
                 type='button'
                 disabled={uploading}
                 onClick={handleImageSubmit}
-                className='w-full mt-4 py-2.5 text-sm font-semibold text-blue-600 border border-blue-200 rounded-xl hover:bg-blue-50 disabled:opacity-50 transition-all'
+                className='w-full mt-4 py-2.5 text-sm font-semibold text-teal-600 border border-teal-200 rounded-xl hover:bg-teal-50 disabled:opacity-50 transition-all'
               >
                 {uploading ? 'Uploading...' : 'Upload Images'}
               </button>
@@ -313,7 +335,7 @@ export default function CreateListing() {
             {/* Submit */}
             <button
               disabled={loading || uploading}
-              className='w-full py-3.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm shadow-sm'
+              className='w-full py-3.5 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors disabled:opacity-50 text-sm shadow-sm'
             >
               {loading ? 'Publishing...' : 'Publish Listing'}
             </button>

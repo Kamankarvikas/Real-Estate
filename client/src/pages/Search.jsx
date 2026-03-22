@@ -243,7 +243,7 @@ export default function Search() {
           )}
           {loading && (
             <div className='flex justify-center py-16'>
-              <div className='w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin'></div>
+              <div className='w-8 h-8 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin'></div>
             </div>
           )}
 
@@ -259,7 +259,7 @@ export default function Search() {
             <div className='text-center mt-8'>
               <button
                 onClick={onShowMoreClick}
-                className='px-8 py-3 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors'
+                className='px-8 py-3 text-sm font-semibold text-teal-600 border border-teal-200 rounded-lg hover:bg-teal-50 transition-colors'
               >
                 Show more
               </button>

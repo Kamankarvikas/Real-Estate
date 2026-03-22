@@ -21,6 +21,7 @@ import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 export default function Profile() {
   const fileRef = useRef(null);
+  const listingsRef = useRef(null);
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
@@ -29,6 +30,7 @@ export default function Profile() {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
+  const [listingsFetched, setListingsFetched] = useState(false);
   const dispatch = useDispatch();
 
   // firebase storage
@@ -137,16 +139,22 @@ export default function Profile() {
   const handleShowListings = async () => {
     try {
       setShowListingsError(false);
+      setListingsFetched(false);
       const res = await fetch(`/api/user/listings/${currentUser._id}`);
       const data = await res.json();
       if (data.success === false) {
         setShowListingsError(true);
+        setListingsFetched(true);
         return;
       }
 
       setUserListings(data);
+      setListingsFetched(true);
+      setTimeout(() => listingsRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch (error) {
       setShowListingsError(true);
+      setListingsFetched(true);
+      setTimeout(() => listingsRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     }
   };
 
@@ -175,7 +183,7 @@ export default function Profile() {
       {/* Profile Card */}
       <div className='bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden'>
         {/* Header banner */}
-        <div className='bg-slate-900 h-28'></div>
+        <div className='bg-teal-900 h-28'></div>
         <div className='px-6 sm:px-8 pb-8 -mt-14'>
           {/* Avatar */}
           <input
@@ -197,7 +205,7 @@ export default function Profile() {
                 Error uploading image (max 2 MB)
               </span>
             ) : filePerc > 0 && filePerc < 100 ? (
-              <span className='text-blue-600'>{`Uploading ${filePerc}%`}</span>
+              <span className='text-teal-600'>{`Uploading ${filePerc}%`}</span>
             ) : filePerc === 100 ? (
               <span className='text-emerald-600'>Image uploaded successfully!</span>
             ) : (
@@ -217,7 +225,7 @@ export default function Profile() {
                 placeholder='username'
                 defaultValue={currentUser.username}
                 id='username'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors'
+                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
                 onChange={handleChange}
               />
             </div>
@@ -228,7 +236,7 @@ export default function Profile() {
                 placeholder='email'
                 id='email'
                 defaultValue={currentUser.email}
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors'
+                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
                 onChange={handleChange}
               />
             </div>
@@ -239,14 +247,14 @@ export default function Profile() {
                 placeholder='New password'
                 onChange={handleChange}
                 id='password'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors'
+                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
               />
             </div>
 
             <div className='flex gap-3 pt-2'>
               <button
                 disabled={loading}
-                className='flex-1 py-3 text-white font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm'
+                className='flex-1 py-3 text-white font-semibold rounded-xl bg-teal-600 hover:bg-teal-700 transition-colors disabled:opacity-50 text-sm'
               >
                 {loading ? 'Saving...' : 'Save Changes'}
               </button>
@@ -293,12 +301,34 @@ export default function Profile() {
       <div className='text-center mt-8'>
         <button
           onClick={handleShowListings}
-          className='text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors'
+          className='text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors'
         >
           View My Listings
         </button>
         {showListingsError && <p className='mt-2 text-sm text-red-500'>Error loading listings</p>}
       </div>
+
+      {/* Listings section scroll target */}
+      <div ref={listingsRef}></div>
+
+      {/* Empty state */}
+      {listingsFetched && userListings.length === 0 && !showListingsError && (
+        <div className='mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center'>
+          <div className='w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-4'>
+            <svg className='w-7 h-7 text-teal-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z' />
+            </svg>
+          </div>
+          <h3 className='text-lg font-bold text-slate-800 mb-1'>No Listings Yet</h3>
+          <p className='text-sm text-gray-400 mb-6 max-w-xs mx-auto'>You haven't created any listings yet. Start listing your property to reach potential buyers and renters.</p>
+          <Link
+            to='/create-listing'
+            className='inline-block bg-teal-600 text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-teal-700 transition-colors text-sm'
+          >
+            Create Your First Listing
+          </Link>
+        </div>
+      )}
 
       {/* User Listings */}
       {userListings && userListings.length > 0 && (
@@ -317,7 +347,7 @@ export default function Profile() {
                   ></div>
                 </Link>
                 <Link
-                  className='flex-1 font-medium text-sm text-gray-800 truncate hover:text-blue-600 transition-colors'
+                  className='flex-1 font-medium text-sm text-gray-800 truncate hover:text-teal-600 transition-colors'
                   to={`/listing/${listing._id}`}
                 >
                   <p>{listing.name}</p>
@@ -325,7 +355,7 @@ export default function Profile() {
 
                 <div className='flex items-center gap-2 flex-shrink-0'>
                   <Link to={`/update-listing/${listing._id}`}>
-                    <button className='text-xs font-semibold text-blue-600 hover:text-blue-800 px-3 py-1.5 bg-blue-50 rounded-lg transition-colors'>
+                    <button className='text-xs font-semibold text-teal-600 hover:text-teal-800 px-3 py-1.5 bg-teal-50 rounded-lg transition-colors'>
                       Edit
                     </button>
                   </Link>
