@@ -118,15 +118,15 @@ export default function Listing() {
             <ul className='flex flex-wrap items-center gap-4 text-sm font-semibold text-green-900 sm:gap-6'>
               <li className='flex items-center gap-1 whitespace-nowrap '>
                 <FaBed className='text-lg' />
-                {listing.bedrooms > 1
+                {(listing.bedrooms || 0) > 1
                   ? `${listing.bedrooms} beds `
-                  : `${listing.bedrooms} bed `}
+                  : `${listing.bedrooms || 0} bed `}
               </li>
               <li className='flex items-center gap-1 whitespace-nowrap '>
                 <FaBath className='text-lg' />
-                {listing.bathrooms > 1
+                {(listing.bathrooms || 0) > 1
                   ? `${listing.bathrooms} baths `
-                  : `${listing.bathrooms} bath `}
+                  : `${listing.bathrooms || 0} bath `}
               </li>
               <li className='flex items-center gap-1 whitespace-nowrap '>
                 <FaParking className='text-lg' />

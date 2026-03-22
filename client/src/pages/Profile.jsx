@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import {
   getDownloadURL,
   getStorage,
@@ -89,8 +90,10 @@ export default function Profile() {
 
       dispatch(updateUserSuccess(data));
       setUpdateSuccess(true);
+      toast.success('Profile updated successfully!');
     } catch (error) {
       dispatch(updateUserFailure(error.message));
+      toast.error('Failed to update profile');
     }
   };
 
@@ -106,8 +109,10 @@ export default function Profile() {
         return;
       }
       dispatch(deleteUserSuccess(data));
+      toast.success('Account deleted successfully');
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
+      toast.error('Failed to delete account');
     }
   };
 
@@ -118,11 +123,14 @@ export default function Profile() {
       const data = await res.json();
       if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
+        toast.error('Failed to sign out');
         return;
       }
       dispatch(deleteUserSuccess(data));
+      toast.success('Signed out successfully!');
     } catch (error) {
-      dispatch(deleteUserFailure(data.message));
+      dispatch(deleteUserFailure(error.message));
+      toast.error('Failed to sign out');
     }
   };
 
@@ -156,136 +164,181 @@ export default function Profile() {
       setUserListings((prev) =>
         prev.filter((listing) => listing._id !== listingId)
       );
+      toast.success('Listing deleted successfully');
     } catch (error) {
       console.log(error.message);
+      toast.error('Failed to delete listing');
     }
   };
   return (
-    <div className='max-w-lg p-3 mx-auto'>
-      <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
-      <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-        <input
-          onChange={(e) => setFile(e.target.files[0])}
-          type='file'
-          ref={fileRef}
-          hidden
-          accept='image/*'
-        />
-        <img
-          onClick={() => fileRef.current.click()}
-          src={formData.avatar || currentUser.avatar}
-          alt='profile'
-          className='self-center object-cover w-24 h-24 mt-2 rounded-full cursor-pointer'
-        />
-        <p className='self-center text-sm'>
-          {fileUploadError ? (
-            <span className='text-red-700'>
-              Error Image upload (image must be less than 2 mb)
-            </span>
-          ) : filePerc > 0 && filePerc < 100 ? (
-            <span className='text-slate-700'>{`Uploading ${filePerc}%`}</span>
-          ) : filePerc === 100 ? (
-            <span className='text-green-700'>Image successfully uploaded!</span>
-          ) : (
-            ''
+    <div className='max-w-2xl mx-auto px-4 py-10'>
+      {/* Profile Card */}
+      <div className='bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden'>
+        {/* Header banner */}
+        <div className='bg-slate-900 h-28'></div>
+        <div className='px-6 sm:px-8 pb-8 -mt-14'>
+          {/* Avatar */}
+          <input
+            onChange={(e) => setFile(e.target.files[0])}
+            type='file'
+            ref={fileRef}
+            hidden
+            accept='image/*'
+          />
+          <img
+            onClick={() => fileRef.current.click()}
+            src={formData.avatar || currentUser.avatar}
+            alt='profile'
+            className='w-24 h-24 rounded-full object-cover cursor-pointer border-4 border-white shadow-lg hover:opacity-90 transition-opacity'
+          />
+          <p className='text-sm mt-2'>
+            {fileUploadError ? (
+              <span className='text-red-500'>
+                Error uploading image (max 2 MB)
+              </span>
+            ) : filePerc > 0 && filePerc < 100 ? (
+              <span className='text-blue-600'>{`Uploading ${filePerc}%`}</span>
+            ) : filePerc === 100 ? (
+              <span className='text-emerald-600'>Image uploaded successfully!</span>
+            ) : (
+              ''
+            )}
+          </p>
+
+          <h1 className='text-xl font-bold text-slate-800 mt-3'>{currentUser.username}</h1>
+          <p className='text-sm text-gray-400'>{currentUser.email}</p>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className='mt-6 space-y-4'>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1.5'>Username</label>
+              <input
+                type='text'
+                placeholder='username'
+                defaultValue={currentUser.username}
+                id='username'
+                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors'
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1.5'>Email</label>
+              <input
+                type='email'
+                placeholder='email'
+                id='email'
+                defaultValue={currentUser.email}
+                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors'
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1.5'>Password</label>
+              <input
+                type='password'
+                placeholder='New password'
+                onChange={handleChange}
+                id='password'
+                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors'
+              />
+            </div>
+
+            <div className='flex gap-3 pt-2'>
+              <button
+                disabled={loading}
+                className='flex-1 py-3 text-white font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm'
+              >
+                {loading ? 'Saving...' : 'Save Changes'}
+              </button>
+              <Link
+                className='flex-1 py-3 text-center text-white font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 transition-colors text-sm'
+                to={'/create-listing'}
+              >
+                Create Listing
+              </Link>
+            </div>
+          </form>
+
+          {/* Delete / Sign out */}
+          <div className='flex justify-between mt-6 pt-6 border-t border-gray-100'>
+            <button
+              onClick={handleDeleteUser}
+              className='text-sm text-gray-400 hover:text-red-500 transition-colors font-medium'
+            >
+              Delete account
+            </button>
+            <button
+              onClick={handleSignOut}
+              className='text-sm text-gray-400 hover:text-red-500 transition-colors font-medium'
+            >
+              Sign out
+            </button>
+          </div>
+
+          {/* Messages */}
+          {error && (
+            <div className='mt-4 p-3 bg-red-50 border border-red-100 rounded-xl'>
+              <p className='text-sm text-red-600'>{error}</p>
+            </div>
           )}
-        </p>
-        <input
-          type='text'
-          placeholder='username'
-          defaultValue={currentUser.username}
-          id='username'
-          className='p-3 border rounded-lg'
-          onChange={handleChange}
-        />
-        <input
-          type='email'
-          placeholder='email'
-          id='email'
-          defaultValue={currentUser.email}
-          className='p-3 border rounded-lg'
-          onChange={handleChange}
-        />
-        <input
-          type='password'
-          placeholder='password'
-          onChange={handleChange}
-          id='password'
-          className='p-3 border rounded-lg'
-        />
-        <button
-          disabled={loading}
-          className='p-3 text-white uppercase rounded-lg bg-slate-700 hover:opacity-95 disabled:opacity-80'
-        >
-          {loading ? 'Loading...' : 'Update'}
-        </button>
-        <Link
-          className='p-3 text-center text-white uppercase bg-green-700 rounded-lg hover:opacity-95'
-          to={'/create-listing'}
-        >
-          Create Listing
-        </Link>
-      </form>
-      <div className='flex justify-between mt-5'>
-        <span
-          onClick={handleDeleteUser}
-          className='text-red-700 cursor-pointer'
-        >
-          Delete account
-        </span>
-        <span onClick={handleSignOut} className='text-red-700 cursor-pointer'>
-          Sign out
-        </span>
+          {updateSuccess && (
+            <div className='mt-4 p-3 bg-emerald-50 border border-emerald-100 rounded-xl'>
+              <p className='text-sm text-emerald-600'>Profile updated successfully!</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      <p className='mt-5 text-red-700'>{error ? error : ''}</p>
-      <p className='mt-5 text-green-700'>
-        {updateSuccess ? 'User is updated successfully!' : ''}
-      </p>
-      <button onClick={handleShowListings} className='w-full text-green-700'>
-        Show Listings
-      </button>
-      <p className='mt-5 text-red-700'>
-        {showListingsError ? 'Error showing listings' : ''}
-      </p>
+      {/* Show Listings Button */}
+      <div className='text-center mt-8'>
+        <button
+          onClick={handleShowListings}
+          className='text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors'
+        >
+          View My Listings
+        </button>
+        {showListingsError && <p className='mt-2 text-sm text-red-500'>Error loading listings</p>}
+      </div>
 
+      {/* User Listings */}
       {userListings && userListings.length > 0 && (
-        <div className='flex flex-col gap-4'>
-          <h1 className='text-2xl font-semibold text-center mt-7'>
-            Your Listings
-          </h1>
-          {userListings.map((listing) => (
-            <div
-              key={listing._id}
-              className='flex items-center justify-between gap-4 p-3 border rounded-lg'
-            >
-              <Link to={`/listing/${listing._id}`}>
-                <img
-                  src={listing.imageUrls[0]}
-                  alt='listing cover'
-                  className='object-contain w-16 h-16'
-                />
-              </Link>
-              <Link
-                className='flex-1 font-semibold truncate text-slate-700 hover:underline'
-                to={`/listing/${listing._id}`}
+        <div className='mt-8'>
+          <h2 className='text-lg font-bold text-slate-800 mb-4'>Your Listings</h2>
+          <div className='space-y-3'>
+            {userListings.map((listing) => (
+              <div
+                key={listing._id}
+                className='flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow'
               >
-                <p>{listing.name}</p>
-              </Link>
-
-              <div className='flex flex-col item-center'>
-                <button
-                  onClick={() => handleListingDelete(listing._id)}
-                  className='text-red-700 uppercase'
-                >
-                  Delete
-                </button>
-                <Link to={`/update-listing/${listing._id}`}>
-                  <button className='text-green-700 uppercase'>Edit</button>
+                <Link to={`/listing/${listing._id}`} className='flex-shrink-0'>
+                  <div
+                    className='w-20 h-16 rounded-lg bg-gray-200 bg-center bg-cover'
+                    style={{ backgroundImage: `url(${listing.imageUrls[0]})` }}
+                  ></div>
                 </Link>
+                <Link
+                  className='flex-1 font-medium text-sm text-gray-800 truncate hover:text-blue-600 transition-colors'
+                  to={`/listing/${listing._id}`}
+                >
+                  <p>{listing.name}</p>
+                </Link>
+
+                <div className='flex items-center gap-2 flex-shrink-0'>
+                  <Link to={`/update-listing/${listing._id}`}>
+                    <button className='text-xs font-semibold text-blue-600 hover:text-blue-800 px-3 py-1.5 bg-blue-50 rounded-lg transition-colors'>
+                      Edit
+                    </button>
+                  </Link>
+                  <button
+                    onClick={() => handleListingDelete(listing._id)}
+                    className='text-xs font-semibold text-red-500 hover:text-red-700 px-3 py-1.5 bg-red-50 rounded-lg transition-colors'
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

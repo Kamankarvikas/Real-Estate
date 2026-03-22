@@ -1,5 +1,5 @@
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
@@ -11,11 +11,32 @@ import CreateListing from './pages/CreateListing';
 import UpdateListing from './pages/UpdateListing';
 import Listing from './pages/Listing';
 import Search from './pages/Search';
+import { Toaster } from 'react-hot-toast';
 
-export default function App() {
+function Layout() {
+  const location = useLocation();
+  const hideHeader = ['/sign-in', '/sign-up', '/sign-Up'].includes(location.pathname);
+
   return (
-    <BrowserRouter>
-      <Header />
+    <>
+      <Toaster
+        position='top-center'
+        toastOptions={{
+          duration: 3000,
+          style: {
+            fontSize: '14px',
+            borderRadius: '12px',
+            padding: '12px 20px',
+          },
+          success: {
+            style: { background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0' },
+          },
+          error: {
+            style: { background: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca' },
+          },
+        }}
+      />
+      {!hideHeader && <Header />}
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/sign-in' element={<SignIn />} />
@@ -33,6 +54,14 @@ export default function App() {
           />
         </Route>
       </Routes>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Layout />
     </BrowserRouter>
   );
 }

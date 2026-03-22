@@ -134,7 +134,7 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
               className='px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors'
             >
-              Search
+              Explore Properties
             </Link>
             <Link
               to='/profile'

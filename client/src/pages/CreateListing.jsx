@@ -154,218 +154,177 @@ export default function CreateListing() {
     }
   };
   return (
-    <main className='p-3 max-w-4xl mx-auto'>
-      <h1 className='text-3xl font-semibold text-center my-7'>
-        Create a Listing
-      </h1>
-      <form onSubmit={handleSubmit} className='flex flex-col sm:flex-row gap-4'>
-        <div className='flex flex-col gap-4 flex-1'>
-          <input
-            type='text'
-            placeholder='Name'
-            className='border p-3 rounded-lg'
-            id='name'
-            maxLength='62'
-            minLength='10'
-            required
-            onChange={handleChange}
-            value={formData.name}
-          />
-          <textarea
-            type='text'
-            placeholder='Description'
-            className='border p-3 rounded-lg'
-            id='description'
-            required
-            onChange={handleChange}
-            value={formData.description}
-          />
-          <input
-            type='text'
-            placeholder='Address'
-            className='border p-3 rounded-lg'
-            id='address'
-            required
-            onChange={handleChange}
-            value={formData.address}
-          />
-          <div className='flex gap-6 flex-wrap'>
-            <div className='flex gap-2'>
-              <input
-                type='checkbox'
-                id='sale'
-                className='w-5'
-                onChange={handleChange}
-                checked={formData.type === 'sale'}
-              />
-              <span>Sell</span>
+    <div className='bg-gray-50 min-h-screen'>
+      <div className='max-w-5xl mx-auto px-4 sm:px-6 py-10'>
+        {/* Header */}
+        <div className='mb-8'>
+          <h1 className='text-2xl lg:text-3xl font-bold text-slate-800'>Create a Listing</h1>
+          <p className='text-gray-500 text-sm mt-1'>Fill in the details below to list your property</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className='grid lg:grid-cols-5 gap-6'>
+          {/* Left - Property Details */}
+          <div className='lg:col-span-3 space-y-6'>
+            {/* Basic Info Card */}
+            <div className='bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4'>
+              <h3 className='font-bold text-slate-800'>Property Details</h3>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Property Name</label>
+                <input
+                  type='text'
+                  placeholder='e.g. Modern 3BHK Apartment'
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors'
+                  id='name'
+                  maxLength='62'
+                  minLength='10'
+                  required
+                  onChange={handleChange}
+                  value={formData.name}
+                />
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Description</label>
+                <textarea
+                  placeholder='Describe your property in detail...'
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors min-h-[120px] resize-none'
+                  id='description'
+                  required
+                  onChange={handleChange}
+                  value={formData.description}
+                />
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Address</label>
+                <input
+                  type='text'
+                  placeholder='Full property address'
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-blue-400 transition-colors'
+                  id='address'
+                  required
+                  onChange={handleChange}
+                  value={formData.address}
+                />
+              </div>
             </div>
-            <div className='flex gap-2'>
-              <input
-                type='checkbox'
-                id='rent'
-                className='w-5'
-                onChange={handleChange}
-                checked={formData.type === 'rent'}
-              />
-              <span>Rent</span>
-            </div>
-            <div className='flex gap-2'>
-              <input
-                type='checkbox'
-                id='parking'
-                className='w-5'
-                onChange={handleChange}
-                checked={formData.parking}
-              />
-              <span>Parking spot</span>
-            </div>
-            <div className='flex gap-2'>
-              <input
-                type='checkbox'
-                id='furnished'
-                className='w-5'
-                onChange={handleChange}
-                checked={formData.furnished}
-              />
-              <span>Furnished</span>
-            </div>
-            <div className='flex gap-2'>
-              <input
-                type='checkbox'
-                id='offer'
-                className='w-5'
-                onChange={handleChange}
-                checked={formData.offer}
-              />
-              <span>Offer</span>
-            </div>
-          </div>
-          <div className='flex flex-wrap gap-6'>
-            <div className='flex items-center gap-2'>
-              <input
-                type='number'
-                id='bedrooms'
-                min='1'
-                max='10'
-                required
-                className='p-3 border border-gray-300 rounded-lg'
-                onChange={handleChange}
-                value={formData.bedrooms}
-              />
-              <p>Beds</p>
-            </div>
-            <div className='flex items-center gap-2'>
-              <input
-                type='number'
-                id='bathrooms'
-                min='1'
-                max='10'
-                required
-                className='p-3 border border-gray-300 rounded-lg'
-                onChange={handleChange}
-                value={formData.bathrooms}
-              />
-              <p>Baths</p>
-            </div>
-            <div className='flex items-center gap-2'>
-              <input
-                type='number'
-                id='regularPrice'
-                min='50'
-                max='10000000'
-                required
-                className='p-3 border border-gray-300 rounded-lg'
-                onChange={handleChange}
-                value={formData.regularPrice}
-              />
-              <div className='flex flex-col items-center'>
-                <p>Regular price</p>
-                {formData.type === 'rent' && (
-                  <span className='text-xs'>($ / month)</span>
+
+            {/* Type & Features Card */}
+            <div className='bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5'>
+              <h3 className='font-bold text-slate-800'>Type & Features</h3>
+
+              <div>
+                <label className='block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3'>Listing Type</label>
+                <div className='flex gap-3'>
+                  {['sale', 'rent'].map((type) => (
+                    <label key={type} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 cursor-pointer text-sm font-medium transition-all ${formData.type === type ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
+                      <input type='checkbox' id={type} className='sr-only' onChange={handleChange} checked={formData.type === type} />
+                      {type === 'sale' ? 'For Sale' : 'For Rent'}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className='block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3'>Amenities</label>
+                <div className='flex flex-wrap gap-3'>
+                  {[
+                    { id: 'parking', label: 'Parking' },
+                    { id: 'furnished', label: 'Furnished' },
+                    { id: 'offer', label: 'Special Offer' },
+                  ].map((item) => (
+                    <label key={item.id} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border cursor-pointer text-sm transition-all ${formData[item.id] ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
+                      <input type='checkbox' id={item.id} className='sr-only' onChange={handleChange} checked={formData[item.id]} />
+                      {item.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className='grid grid-cols-2 sm:grid-cols-4 gap-4'>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Beds</label>
+                  <input type='number' id='bedrooms' min='1' max='10' required className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400' onChange={handleChange} value={formData.bedrooms} />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Baths</label>
+                  <input type='number' id='bathrooms' min='1' max='10' required className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400' onChange={handleChange} value={formData.bathrooms} />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Price {formData.type === 'rent' ? '($/mo)' : '($)'}</label>
+                  <input type='number' id='regularPrice' min='50' max='10000000' required className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400' onChange={handleChange} value={formData.regularPrice} />
+                </div>
+                {formData.offer && (
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-1.5'>Discount {formData.type === 'rent' ? '($/mo)' : '($)'}</label>
+                    <input type='number' id='discountPrice' min='0' max='10000000' required className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400' onChange={handleChange} value={formData.discountPrice} />
+                  </div>
                 )}
               </div>
             </div>
-            {formData.offer && (
-              <div className='flex items-center gap-2'>
-                <input
-                  type='number'
-                  id='discountPrice'
-                  min='0'
-                  max='10000000'
-                  required
-                  className='p-3 border border-gray-300 rounded-lg'
-                  onChange={handleChange}
-                  value={formData.discountPrice}
-                />
-                <div className='flex flex-col items-center'>
-                  <p>Discounted price</p>
+          </div>
 
-                  {formData.type === 'rent' && (
-                    <span className='text-xs'>($ / month)</span>
-                  )}
-                </div>
+          {/* Right - Images & Submit */}
+          <div className='lg:col-span-2 space-y-6'>
+            {/* Upload Card */}
+            <div className='bg-white rounded-2xl border border-gray-100 shadow-sm p-6'>
+              <h3 className='font-bold text-slate-800 mb-1'>Photos</h3>
+              <p className='text-sm text-gray-400 mb-5'>First image is the cover. Max 6 images.</p>
+
+              <div className='border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-blue-300 transition-colors'>
+                <input onChange={(e) => setFiles(e.target.files)} className='hidden' type='file' id='images' accept='image/*' multiple />
+                <label htmlFor='images' className='cursor-pointer'>
+                  <svg className='w-10 h-10 text-gray-300 mx-auto mb-3' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' /></svg>
+                  <p className='text-sm text-gray-500'>Click to select images</p>
+                  <p className='text-xs text-gray-400 mt-1'>PNG, JPG up to 2MB each</p>
+                </label>
+              </div>
+
+              <button
+                type='button'
+                disabled={uploading}
+                onClick={handleImageSubmit}
+                className='w-full mt-4 py-2.5 text-sm font-semibold text-blue-600 border border-blue-200 rounded-xl hover:bg-blue-50 disabled:opacity-50 transition-all'
+              >
+                {uploading ? 'Uploading...' : 'Upload Images'}
+              </button>
+
+              {imageUploadError && <p className='text-red-500 text-sm mt-3'>{imageUploadError}</p>}
+            </div>
+
+            {/* Uploaded images */}
+            {formData.imageUrls.length > 0 && (
+              <div className='space-y-3'>
+                {formData.imageUrls.map((url, index) => (
+                  <div key={url} className='flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-xl shadow-sm'>
+                    <div
+                      className='w-16 h-16 rounded-lg bg-gray-200 bg-center bg-cover flex-shrink-0'
+                      style={{ backgroundImage: `url(${url})` }}
+                    ></div>
+                    <div className='flex-1'>
+                      <p className='text-xs text-gray-500'>Image {index + 1}{index === 0 && ' (Cover)'}</p>
+                    </div>
+                    <button type='button' onClick={() => handleRemoveImage(index)} className='text-xs font-semibold text-red-500 hover:text-red-700 px-3 py-1.5 bg-red-50 rounded-lg transition-colors'>
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Submit */}
+            <button
+              disabled={loading || uploading}
+              className='w-full py-3.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm shadow-sm'
+            >
+              {loading ? 'Publishing...' : 'Publish Listing'}
+            </button>
+            {error && (
+              <div className='p-3 bg-red-50 border border-red-100 rounded-xl'>
+                <p className='text-sm text-red-600'>{error}</p>
               </div>
             )}
           </div>
-        </div>
-        <div className='flex flex-col flex-1 gap-4'>
-          <p className='font-semibold'>
-            Images:
-            <span className='font-normal text-gray-600 ml-2'>
-              The first image will be the cover (max 6)
-            </span>
-          </p>
-          <div className='flex gap-4'>
-            <input
-              onChange={(e) => setFiles(e.target.files)}
-              className='p-3 border border-gray-300 rounded w-full'
-              type='file'
-              id='images'
-              accept='image/*'
-              multiple
-            />
-            <button
-              type='button'
-              disabled={uploading}
-              onClick={handleImageSubmit}
-              className='p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80'
-            >
-              {uploading ? 'Uploading...' : 'Upload'}
-            </button>
-          </div>
-          <p className='text-red-700 text-sm'>
-            {imageUploadError && imageUploadError}
-          </p>
-          {formData.imageUrls.length > 0 &&
-            formData.imageUrls.map((url, index) => (
-              <div
-                key={url}
-                className='flex justify-between p-3 border items-center'
-              >
-                <img
-                  src={url}
-                  alt='listing image'
-                  className='w-20 h-20 object-contain rounded-lg'
-                />
-                <button
-                  type='button'
-                  onClick={() => handleRemoveImage(index)}
-                  className='p-3 text-red-700 rounded-lg uppercase hover:opacity-75'
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
-          <button
-            disabled={loading || uploading}
-            className='p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80'
-          >
-            {loading ? 'Creating...' : 'Create listing'}
-          </button>
-          {error && <p className='text-red-700 text-sm'>{error}</p>}
-        </div>
-      </form>
-    </main>
+        </form>
+      </div>
+    </div>
   );
 }

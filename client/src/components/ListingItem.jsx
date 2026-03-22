@@ -5,12 +5,12 @@ import { FaBed, FaBath } from 'react-icons/fa';
 
 export default function ListingItem({ listing }) {
   return (
-    <Link to={`/listing/${listing._id}`} className='group'>
+    <Link to={`/listing/${listing._id}`} className='group block h-full'>
       <div className='bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 h-full flex flex-col'>
-        {/* Image using background-image for reliable loading */}
-        <div className='relative overflow-hidden'>
+        {/* Image - fixed height for consistency */}
+        <div className='relative overflow-hidden flex-shrink-0'>
           <div
-            className='h-[200px] sm:h-[220px] w-full bg-gray-200 bg-center bg-cover group-hover:scale-105 transition-transform duration-500'
+            className='h-48 w-full bg-gray-200 bg-center bg-cover group-hover:scale-105 transition-transform duration-500'
             style={{
               backgroundImage: `url(${
                 listing.imageUrls[0] ||
@@ -33,10 +33,10 @@ export default function ListingItem({ listing }) {
           )}
         </div>
 
-        {/* Content */}
-        <div className='p-5 flex flex-col gap-2 flex-1'>
+        {/* Content - flex-1 ensures equal height cards */}
+        <div className='p-4 flex flex-col flex-1'>
           {/* Price */}
-          <p className='text-xl font-bold text-slate-900'>
+          <p className='text-lg font-bold text-slate-900 mb-1'>
             $
             {listing.offer
               ? (listing.discountPrice || 0).toLocaleString('en-US')
@@ -47,34 +47,34 @@ export default function ListingItem({ listing }) {
           </p>
 
           {/* Name */}
-          <p className='truncate font-semibold text-slate-700'>
+          <p className='truncate font-semibold text-slate-700 text-sm mb-1'>
             {listing.name}
           </p>
 
           {/* Location */}
-          <div className='flex items-center gap-1'>
-            <MdLocationOn className='h-4 w-4 text-blue-500 flex-shrink-0' />
-            <p className='text-sm text-gray-500 truncate'>
+          <div className='flex items-center gap-1 mb-2'>
+            <MdLocationOn className='h-3.5 w-3.5 text-blue-500 flex-shrink-0' />
+            <p className='text-xs text-gray-500 truncate'>
               {listing.address}
             </p>
           </div>
 
           {/* Description */}
-          <p className='text-sm text-gray-400 line-clamp-2 leading-relaxed'>
+          <p className='text-xs text-gray-400 line-clamp-2 leading-relaxed mb-3'>
             {listing.description}
           </p>
 
-          {/* Beds / Baths */}
+          {/* Beds / Baths - pushed to bottom */}
           <div className='flex gap-4 mt-auto pt-3 border-t border-gray-100'>
-            <div className='flex items-center gap-1.5 text-gray-500'>
-              <FaBed className='text-sm text-blue-500' />
-              <span className='text-xs font-semibold'>
+            <div className='flex items-center gap-1.5'>
+              <FaBed className='text-xs text-blue-500' />
+              <span className='text-xs font-semibold text-gray-500'>
                 {listing.bedrooms || 0} {(listing.bedrooms || 0) > 1 ? 'Beds' : 'Bed'}
               </span>
             </div>
-            <div className='flex items-center gap-1.5 text-gray-500'>
-              <FaBath className='text-sm text-blue-500' />
-              <span className='text-xs font-semibold'>
+            <div className='flex items-center gap-1.5'>
+              <FaBath className='text-xs text-blue-500' />
+              <span className='text-xs font-semibold text-gray-500'>
                 {listing.bathrooms || 0} {(listing.bathrooms || 0) > 1 ? 'Baths' : 'Bath'}
               </span>
             </div>

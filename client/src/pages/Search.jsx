@@ -231,32 +231,39 @@ export default function Search() {
         </form>
       </div>
       <div className='flex-1'>
-        <h1 className='p-3 mt-5 text-3xl font-semibold border-b text-slate-700'>
-          Listing results:
+        <h1 className='px-6 py-5 text-xl font-bold border-b text-slate-800'>
+          Listing results
         </h1>
-        <div className='flex flex-wrap gap-4 p-7'>
+        <div className='p-6'>
           {!loading && listings.length === 0 && (
-            <p className='text-xl text-slate-700'>No listing found!</p>
+            <div className='text-center py-16'>
+              <p className='text-lg font-semibold text-slate-700 mb-1'>No listing found!</p>
+              <p className='text-sm text-gray-400'>Try adjusting your search or filters</p>
+            </div>
           )}
           {loading && (
-            <p className='w-full text-xl text-center text-slate-700'>
-              Loading...
-            </p>
+            <div className='flex justify-center py-16'>
+              <div className='w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin'></div>
+            </div>
           )}
 
-          {!loading &&
-            listings &&
-            listings.map((listing) => (
-              <ListingItem key={listing._id} listing={listing} />
-            ))}
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
+            {!loading &&
+              listings &&
+              listings.map((listing) => (
+                <ListingItem key={listing._id} listing={listing} />
+              ))}
+          </div>
 
           {showMore && (
-            <button
-              onClick={onShowMoreClick}
-              className='w-full text-center text-green-700 hover:underline p-7'
-            >
-              Show more
-            </button>
+            <div className='text-center mt-8'>
+              <button
+                onClick={onShowMoreClick}
+                className='px-8 py-3 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors'
+              >
+                Show more
+              </button>
+            </div>
           )}
         </div>
       </div>
