@@ -1,11 +1,4 @@
 import { useState } from 'react';
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from 'firebase/storage';
-import { app } from '../firebase';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -32,8 +25,8 @@ export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  console.log(formData);
-  const handleImageSubmit = (e) => {
+
+  const handleImageSubmit = () => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       setUploading(true);
       setImageUploadError(false);
@@ -50,40 +43,32 @@ export default function CreateListing() {
           });
           setImageUploadError(false);
           setUploading(false);
+          toast.success(`${urls.length} image(s) uploaded successfully`);
         })
         .catch((err) => {
-          setImageUploadError('Image upload failed (2 mb max per image)');
+          setImageUploadError(false);
           setUploading(false);
+          toast.error(err.message || 'Image upload failed. Please try again.');
         });
     } else {
-      setImageUploadError('You can only upload 6 images per listing');
+      toast.error('You can only upload 6 images per listing');
       setUploading(false);
     }
   };
 
   const storeImage = async (file) => {
-    return new Promise((resolve, reject) => {
-      const storage = getStorage(app);
-      const fileName = new Date().getTime() + file.name;
-      const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log(`Upload is ${progress}% done`);
-        },
-        (error) => {
-          reject(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            resolve(downloadURL);
-          });
-        }
-      );
+    const formDataUpload = new FormData();
+    formDataUpload.append('image', file);
+
+    const res = await fetch('/api/upload/image', {
+      method: 'POST',
+      body: formDataUpload,
     });
+    const data = await res.json();
+    if (!res.ok || data.success === false) {
+      throw new Error(data.message || 'Upload failed');
+    }
+    return data.url;
   };
 
   const handleRemoveImage = (index) => {
@@ -167,7 +152,7 @@ export default function CreateListing() {
         toast.error(data.message || 'Failed to create listing');
       } else {
         toast.success('Listing created successfully!');
-        navigate(`/listing/${data._id}`);
+        navigate('/profile');
       }
     } catch (error) {
       setError(error.message);
@@ -291,25 +276,36 @@ export default function CreateListing() {
               <h3 className='font-bold text-slate-800 mb-1'>Photos</h3>
               <p className='text-sm text-gray-400 mb-5'>First image is the cover. Max 6 images.</p>
 
-              <div className='border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-teal-300 transition-colors'>
-                <input onChange={(e) => setFiles(e.target.files)} className='hidden' type='file' id='images' accept='image/*' multiple />
+              <div className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${files.length > 0 ? 'border-teal-400 bg-teal-50/50' : 'border-gray-200 hover:border-teal-300'}`}>
+                <input onChange={(e) => { setFiles(e.target.files); if (e.target.files.length > 0) toast.success(`${e.target.files.length} image(s) selected. Click "Upload Images" to proceed.`); }} className='hidden' type='file' id='images' accept='image/*' multiple />
                 <label htmlFor='images' className='cursor-pointer'>
-                  <svg className='w-10 h-10 text-gray-300 mx-auto mb-3' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' /></svg>
-                  <p className='text-sm text-gray-500'>Click to select images</p>
-                  <p className='text-xs text-gray-400 mt-1'>PNG, JPG up to 2MB each</p>
+                  {files.length > 0 ? (
+                    <>
+                      <div className='w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-3'>
+                        <svg className='w-5 h-5 text-teal-600' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' /></svg>
+                      </div>
+                      <p className='text-sm font-semibold text-teal-700'>{files.length} image(s) selected</p>
+                      <p className='text-xs text-teal-500 mt-1'>Click to change selection</p>
+                    </>
+                  ) : (
+                    <>
+                      <svg className='w-10 h-10 text-gray-300 mx-auto mb-3' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' /></svg>
+                      <p className='text-sm text-gray-500'>Click to select images</p>
+                      <p className='text-xs text-gray-400 mt-1'>PNG, JPG up to 10MB each</p>
+                    </>
+                  )}
                 </label>
               </div>
 
               <button
                 type='button'
-                disabled={uploading}
+                disabled={uploading || files.length === 0}
                 onClick={handleImageSubmit}
-                className='w-full mt-4 py-2.5 text-sm font-semibold text-teal-600 border border-teal-200 rounded-xl hover:bg-teal-50 disabled:opacity-50 transition-all'
+                className={`w-full mt-4 py-2.5 text-sm font-semibold rounded-xl transition-all disabled:opacity-50 ${files.length > 0 ? 'bg-teal-600 text-white hover:bg-teal-700' : 'text-teal-600 border border-teal-200 hover:bg-teal-50'}`}
               >
-                {uploading ? 'Uploading...' : 'Upload Images'}
+                {uploading ? 'Uploading...' : files.length > 0 ? `Upload ${files.length} Image(s)` : 'Upload Images'}
               </button>
 
-              {imageUploadError && <p className='text-red-500 text-sm mt-3'>{imageUploadError}</p>}
             </div>
 
             {/* Uploaded images */}

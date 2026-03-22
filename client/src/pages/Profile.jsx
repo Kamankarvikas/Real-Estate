@@ -2,13 +2,6 @@ import { useSelector } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from 'firebase/storage';
-import { app } from '../firebase';
-import {
   updateUserStart,
   updateUserSuccess,
   updateUserFailure,
@@ -33,40 +26,40 @@ export default function Profile() {
   const [listingsFetched, setListingsFetched] = useState(false);
   const dispatch = useDispatch();
 
-  // firebase storage
-  // allow read;
-  // allow write: if
-  // request.resource.size < 2 * 1024 * 1024 &&
-  // request.resource.contentType.matches('image/.*')
-
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
     }
   }, [file]);
 
-  const handleFileUpload = (file) => {
-    const storage = getStorage(app);
-    const fileName = new Date().getTime() + file.name;
-    const storageRef = ref(storage, fileName);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+  const handleFileUpload = async (file) => {
+    try {
+      setFilePerc(0);
+      setFileUploadError(false);
+      setFilePerc(50);
 
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setFilePerc(Math.round(progress));
-      },
-      (error) => {
+      const uploadData = new FormData();
+      uploadData.append('image', file);
+
+      const res = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: uploadData,
+      });
+      const data = await res.json();
+
+      if (data.success === false) {
         setFileUploadError(true);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
-          setFormData({ ...formData, avatar: downloadURL })
-        );
+        toast.error('Image upload failed');
+        return;
       }
-    );
+
+      setFormData({ ...formData, avatar: data.url });
+      setFilePerc(100);
+      toast.success('Profile image uploaded!');
+    } catch (error) {
+      setFileUploadError(true);
+      toast.error('Image upload failed');
+    }
   };
 
   const handleChange = (e) => {
