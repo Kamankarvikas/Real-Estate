@@ -1,18 +1,3 @@
-// import { configureStore } from '@reduxjs/toolkit'
-// // import { buildGetDefaultEnhancers } from '@reduxjs/toolkit/dist/getDefaultEnhancers'
-// // import { buildGetDefaultMiddleware } from '@reduxjs/toolkit/dist/getDefaultMiddleware'
-// import { useReducer } from 'react';
-// import userReducer from './user/userSlice';
-
-// export const store = configureStore({
-//     reducer: {user:useReducer},
-//     middleware: (getDefaultMiddleware) =>
-//       getDefaultMiddleware({
-//         serializableCheck: false,
-//       }),
-//   });
-  
-
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import userReducer from './user/userSlice';
 import { persistReducer, persistStore } from 'redux-persist';

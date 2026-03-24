@@ -37,8 +37,6 @@ export default function About() {
           </div>
         </div>
       </div>
-
-      {/* Our Story */}
       <div className='max-w-6xl mx-auto px-6 py-20'>
         <div className='grid lg:grid-cols-2 gap-16'>
           <div>
