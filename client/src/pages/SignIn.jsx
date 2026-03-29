@@ -172,7 +172,10 @@ export default function Signin() {
                 className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors bg-white' id='email' onChange={handleChange}/>
             </div>
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-1.5'>Password <span className='text-red-400'>*</span></label>
+              <div className='flex items-center justify-between mb-1.5'>
+                <label className='block text-sm font-medium text-gray-700'>Password <span className='text-red-400'>*</span></label>
+                <Link to='/forgot-password' className='text-xs font-medium text-teal-600 hover:text-teal-800 transition-colors'>Forgot Password?</Link>
+              </div>
               <div className='relative'>
                 <input type={showPassword ? 'text' : 'password'} placeholder='Enter your password'
                   className='w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors bg-white' id='password' onChange={handleChange}/>

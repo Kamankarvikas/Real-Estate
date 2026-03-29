@@ -3,7 +3,7 @@ import bcryptjs from 'bcryptjs';
 import {errorHandler} from '../utils/error.js';
 import jwt from 'jsonwebtoken';
 import getTransporter from '../config/nodemailer.js';
-import { verificationEmailTemplate, welcomeEmailTemplate } from '../utils/emailTemplates.js';
+import { verificationEmailTemplate, welcomeEmailTemplate, resetPasswordEmailTemplate } from '../utils/emailTemplates.js';
 
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
@@ -169,6 +169,56 @@ export const Google = async (req, res, next) => {
     next(error);
   }
 };
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) return next(errorHandler(400, 'Please enter your email address'));
+
+    const user = await User.findOne({ email });
+    if (!user) return next(errorHandler(404, 'No account found with this email address'));
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const resetLink = `${CLIENT_URL}/reset-password?token=${token}`;
+
+    await getTransporter().sendMail({
+      from: `"Kamankar Estate" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Reset your password - Kamankar Estate',
+      html: resetPasswordEmailTemplate(user.username, resetLink),
+    });
+
+    res.status(200).json({ success: true, message: 'Password reset link sent to your email' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token) return next(errorHandler(400, 'Reset token is required'));
+    if (!newPassword || newPassword.length < 6)
+      return next(errorHandler(400, 'Password must be at least 6 characters'));
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user) return next(errorHandler(404, 'User not found'));
+
+    user.password = bcryptjs.hashSync(newPassword, 10);
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Password reset successfully! You can now sign in.' });
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return next(errorHandler(400, 'Reset link has expired. Please request a new one.'));
+    }
+    if (error.name === 'JsonWebTokenError') {
+      return next(errorHandler(400, 'Invalid reset link. Please request a new one.'));
+    }
+    next(error);
+  }
+};
+
 export const signOut = async (req, res, next) => {
   try {
     res.clearCookie('access_token', { httpOnly: true, secure: true, sameSite: 'none' });
