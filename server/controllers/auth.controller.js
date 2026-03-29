@@ -75,7 +75,6 @@ export const verifyEmail = async (req, res, next) => {
 };
 
 export const resendVerification = async (req, res, next) => {
-  console.log("process.env.EMAIL_USER",process.env.EMAIL_USER)
   try {
     const { email } = req.body;
     if (!email) return next(errorHandler(400, 'Email is required'));

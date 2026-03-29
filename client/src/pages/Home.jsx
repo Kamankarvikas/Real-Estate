@@ -44,7 +44,6 @@ export default function Home() {
   const [rentListings, setRentListings] = useState([]);
   const [loadingDone, setLoadingDone] = useState(false);
   SwiperCore.use([Navigation, Autoplay]);
-  console.log(offerListings);
 
   // Count-up for stats
   const stat1 = useCountUp(200, 2000, loadingDone);
@@ -59,7 +58,6 @@ export default function Home() {
         setOfferListings(data);
         fetchRentListings();
       } catch (error) {
-        console.log(error);
         setLoadingDone(true);
       }
     };
@@ -70,7 +68,6 @@ export default function Home() {
         setRentListings(data);
         fetchSaleListings();
       } catch (error) {
-        console.log(error);
         setLoadingDone(true);
       }
     };

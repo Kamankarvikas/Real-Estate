@@ -29,7 +29,6 @@ export default function OAuth() {
           toast.success('Login successful! Welcome to Kamankar Estate');
         navigate('/');
         }catch(error){
-            console.log("could not sign with error ",error);
             toast.error('Google sign in failed. Please try again.');
         }
     }
