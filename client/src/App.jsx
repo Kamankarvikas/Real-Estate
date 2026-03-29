@@ -11,11 +11,12 @@ import CreateListing from './pages/CreateListing';
 import UpdateListing from './pages/UpdateListing';
 import Listing from './pages/Listing';
 import Search from './pages/Search';
+import ActivateAccount from './pages/ActivateAccount';
 import { Toaster } from 'react-hot-toast';
 
 function Layout() {
   const location = useLocation();
-  const hideHeader = ['/sign-in', '/sign-up', '/sign-Up'].includes(location.pathname);
+  const hideHeader = ['/sign-in', '/sign-up', '/sign-Up', '/activate-account'].includes(location.pathname);
 
   return (
     <>
@@ -43,6 +44,7 @@ function Layout() {
         <Route path='/sign-up' element={<SignUp />} />
         <Route path='/about' element={<About />} />
         <Route path='/search' element={<Search />} />
+        <Route path='/activate-account' element={<ActivateAccount />} />
         <Route path='/listing/:listingId' element={<Listing />} />
 
         <Route element={<PrivateRoute />}>

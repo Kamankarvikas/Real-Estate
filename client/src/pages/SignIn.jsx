@@ -9,6 +9,8 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 export default function Signin() {
   const[formData,setFormData]=useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [notVerified, setNotVerified] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
  const{loading , error}=useSelector((state)=>state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -51,11 +53,14 @@ export default function Signin() {
 
       const data = await res.json();
       if(data.success === false){
-
       dispatch(signInFailure(data.message));
+      if (data.statusCode === 403) {
+        setNotVerified(true);
+      }
       toast.error(data.message || 'Sign in failed');
         return;
       }
+      setNotVerified(false);
       dispatch(signInSuccess(data));
       toast.success('Welcome back! Signed in successfully');
       navigate('/');
@@ -67,6 +72,32 @@ export default function Signin() {
     }
 
    };
+
+  const handleResendVerification = async () => {
+    if (!formData.email) {
+      toast.error('Please enter your email first');
+      return;
+    }
+    try {
+      setResendLoading(true);
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Verification email sent! Check your inbox.');
+      } else {
+        toast.error(data.message || 'Failed to resend email');
+      }
+    } catch (error) {
+      toast.error('Failed to resend verification email');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   return (
     <div className='min-h-screen flex'>
       {/* Left Panel - Desktop only */}
@@ -166,6 +197,19 @@ export default function Signin() {
 
             <OAuth/>
           </form>
+
+          {notVerified && (
+            <div className='mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl text-center'>
+              <p className='text-amber-800 text-sm mb-2'>Didn’t receive the verification email?</p>
+              <button
+                onClick={handleResendVerification}
+                disabled={resendLoading}
+                className='text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors disabled:opacity-50'
+              >
+                {resendLoading ? 'Sending...' : 'Resend Verification Email'}
+              </button>
+            </div>
+          )}
 
           <p className='text-center text-sm text-gray-500 mt-8'>
             Don't have an account?{' '}

@@ -9,6 +9,8 @@ export default function Signout() {
   const [showPassword, setShowPassword] = useState(false);
   const [error,setError]=useState(null);
   const [loading,setloading]=useState(false);
+  const [registered, setRegistered] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
   const navigate = useNavigate();
    const handleChange=(e)=>{
     setFormData({
@@ -64,8 +66,8 @@ export default function Signout() {
       }
       setloading(false);
       setError(null);
-      toast.success('Account created successfully! Please sign in.');
-      navigate('/sign-in');
+      setRegistered(true);
+      toast.success('Account created! Please check your email to verify.');
 
     }catch(error){
        setloading(false);
@@ -74,6 +76,138 @@ export default function Signout() {
     }
 
    };
+
+  const handleResendVerification = async () => {
+    try {
+      setResendLoading(true);
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Verification email sent! Check your inbox.');
+      } else {
+        toast.error(data.message || 'Failed to resend email');
+      }
+    } catch (error) {
+      toast.error('Failed to resend verification email');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  // Show success screen after registration
+  if (registered) {
+    return (
+      <div className='min-h-screen flex'>
+        {/* Left Panel - Desktop only */}
+        <div className='hidden lg:flex lg:w-1/2 bg-gradient-to-br from-teal-600 via-teal-700 to-teal-900 relative overflow-hidden'>
+          <div className='absolute top-0 left-0 w-full h-full'>
+            <div className='absolute top-10 left-10 w-64 h-64 bg-white/5 rounded-full'></div>
+            <div className='absolute top-40 left-40 w-40 h-40 bg-white/5 rounded-full'></div>
+            <div className='absolute bottom-10 right-10 w-80 h-80 bg-white/5 rounded-full'></div>
+            <div className='absolute -top-10 right-20 w-60 h-60 bg-emerald-400/10 rounded-full'></div>
+          </div>
+
+          <div className='relative flex flex-col items-center justify-center px-14 z-10 w-full text-center'>
+            <h2 className='text-2xl font-bold mb-12'>
+              <span className='text-white'>Kamankar</span>
+              <span className='text-emerald-200'>Estate</span>
+            </h2>
+
+            <h1 className='text-4xl font-extrabold text-white leading-tight mb-4'>
+              You're almost<br />there!
+            </h1>
+            <p className='text-emerald-100/70 text-base leading-relaxed max-w-md mb-10'>
+              Just one more step to unlock your property journey. Verify your email and start exploring properties across India.
+            </p>
+
+            <div className='space-y-4 mb-12'>
+              <div className='flex items-center gap-3 justify-center'>
+                <div className='w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0'>
+                  <svg className='w-4 h-4 text-emerald-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' /></svg>
+                </div>
+                <p className='text-white/80 text-sm'>Account created successfully</p>
+              </div>
+              <div className='flex items-center gap-3 justify-center'>
+                <div className='w-8 h-8 bg-emerald-400/20 rounded-lg flex items-center justify-center flex-shrink-0 border border-emerald-400/30'>
+                  <svg className='w-4 h-4 text-emerald-300' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' /></svg>
+                </div>
+                <p className='text-white/80 text-sm'>Verification email sent</p>
+              </div>
+              <div className='flex items-center gap-3 justify-center'>
+                <div className='w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0'>
+                  <svg className='w-4 h-4 text-white/40' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' /></svg>
+                </div>
+                <p className='text-white/40 text-sm'>Verify email to activate</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Panel */}
+        <div className='flex-1 flex flex-col bg-gray-50'>
+          <div className='flex justify-end px-6 pt-5'>
+            <Link to='/' className='text-sm font-medium text-gray-500 hover:text-teal-600 transition-colors'>
+              ← Back to Home
+            </Link>
+          </div>
+
+          <div className='flex-1 flex items-center justify-center px-6 py-8'>
+            <div className='w-full max-w-[420px] text-center'>
+              {/* Mobile logo */}
+              <div className='text-center mb-10 lg:hidden'>
+                <h2 className='text-2xl font-bold'>
+                  <span className='text-slate-800'>Kamankar</span>
+                  <span className='text-teal-600'>Estate</span>
+                </h2>
+              </div>
+
+              {/* Email Icon */}
+              <div className='w-24 h-24 bg-gradient-to-br from-teal-50 to-emerald-50 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg shadow-teal-100'>
+                <div className='w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-full flex items-center justify-center'>
+                  <svg className='w-8 h-8 text-white' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
+                  </svg>
+                </div>
+              </div>
+
+              <h2 className='text-2xl font-bold text-slate-800 mb-2'>Check Your Email</h2>
+              <p className='text-gray-400 text-sm mb-1'>We've sent a verification link to</p>
+              <p className='text-teal-600 font-semibold text-sm mb-6'>{formData.email}</p>
+
+              <div className='bg-teal-50 rounded-xl p-4 mb-8'>
+                <p className='text-teal-700 text-sm leading-relaxed'>
+                  Click the link in the email to verify your account. The link expires in <strong>24 hours</strong>.
+                </p>
+              </div>
+
+              <button
+                onClick={handleResendVerification}
+                disabled={resendLoading}
+                className='w-full py-3 text-teal-600 font-semibold rounded-xl border-2 border-teal-200 hover:border-teal-300 hover:bg-teal-50 transition-colors text-sm disabled:opacity-50'
+              >
+                {resendLoading ? 'Sending...' : "Didn't receive the email? Resend"}
+              </button>
+
+              <div className='mt-6 pt-6 border-t border-gray-100'>
+                <Link to='/sign-in' className='text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors'>
+                  Back to Sign In
+                </Link>
+              </div>
+
+              <p className='text-gray-300 text-xs mt-8'>
+                Check your spam folder if you don't see the email in your inbox.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='min-h-screen flex'>
       {/* Left Panel - Desktop only */}

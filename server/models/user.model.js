@@ -19,6 +19,10 @@ const userSchema=  new mongoose.Schema({
            type:String,
            default:"https://reputationtoday.in/wp-content/uploads/2019/11/110-1102775_download-empty-profile-hd-png-download.jpg"
     },
+    isVerified:{
+           type:Boolean,
+           default:false,
+    },
 },{timestamps:true});
 const User =mongoose.model('User',userSchema);
 export default User;
