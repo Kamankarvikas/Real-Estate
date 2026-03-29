@@ -5,15 +5,17 @@ import { Navigation, Autoplay } from 'swiper/modules';
 import SwiperCore from 'swiper';
 import 'swiper/css/bundle';
 import ListingItem from '../components/ListingItem';
+import Loader from '../components/Loader';
 import { FaSearch, FaRegCalendarCheck, FaKey, FaHome } from 'react-icons/fa';
 
 // ===== Count-up hook =====
-function useCountUp(target, duration = 2000) {
+function useCountUp(target, duration = 2000, enabled = true) {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
   const started = useRef(false);
 
   useEffect(() => {
+    if (!enabled || !ref.current) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !started.current) {
@@ -29,9 +31,9 @@ function useCountUp(target, duration = 2000) {
       },
       { threshold: 0.5 }
     );
-    if (ref.current) observer.observe(ref.current);
+    observer.observe(ref.current);
     return () => observer.disconnect();
-  }, [target, duration]);
+  }, [target, duration, enabled]);
 
   return { count, ref };
 }
@@ -45,9 +47,9 @@ export default function Home() {
   console.log(offerListings);
 
   // Count-up for stats
-  const stat1 = useCountUp(200, 2000);
-  const stat2 = useCountUp(150, 2000);
-  const stat3 = useCountUp(50, 1500);
+  const stat1 = useCountUp(200, 2000, loadingDone);
+  const stat2 = useCountUp(150, 2000, loadingDone);
+  const stat3 = useCountUp(50, 1500, loadingDone);
 
   useEffect(() => {
     const fetchOfferListings = async () => {
@@ -97,6 +99,10 @@ export default function Home() {
   });
 
   const hasListings = offerListings.length > 0 || rentListings.length > 0 || saleListings.length > 0;
+
+  if (!loadingDone) {
+    return <Loader />;
+  }
 
   return (
     <div>

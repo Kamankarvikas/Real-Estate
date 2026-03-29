@@ -51,6 +51,15 @@ body {
 .hero-delay-4 { animation-delay: 1.6s; }
 .hero-delay-5 { animation-delay: 2.0s; }
 
+/* Loader reverse spin */
+@keyframes spin-reverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+.animate-spin-reverse {
+  animation: spin-reverse 1.2s linear infinite;
+}
+
 /* Swiper custom arrows - hidden on mobile */
 .swiper-button-next,
 .swiper-button-prev {
