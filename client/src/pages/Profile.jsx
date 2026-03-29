@@ -12,6 +12,7 @@ import {
 } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import ConfirmModal from '../components/ConfirmModal';
 export default function Profile() {
   const fileRef = useRef(null);
   const listingsRef = useRef(null);
@@ -24,6 +25,7 @@ export default function Profile() {
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
   const [listingsFetched, setListingsFetched] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -269,7 +271,7 @@ export default function Profile() {
               Delete account
             </button>
             <button
-              onClick={handleSignOut}
+              onClick={() => setShowSignOutModal(true)}
               className='text-sm text-gray-400 hover:text-red-500 transition-colors font-medium'
             >
               Sign out
@@ -363,6 +365,17 @@ export default function Profile() {
             ))}
           </div>
         </div>
+      )}
+      {showSignOutModal && (
+        <ConfirmModal
+          title='Sign Out'
+          message='Are you sure you want to sign out?'
+          onConfirm={() => {
+            setShowSignOutModal(false);
+            handleSignOut();
+          }}
+          onCancel={() => setShowSignOutModal(false)}
+        />
       )}
     </div>
   );
