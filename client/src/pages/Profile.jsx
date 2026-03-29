@@ -123,6 +123,7 @@ export default function Profile() {
         toast.error('Failed to sign out');
         return;
       }
+      localStorage.removeItem('access_token');
       dispatch(deleteUserSuccess(data));
       toast.success('Signed out successfully!');
     } catch (error) {

@@ -2,7 +2,7 @@ import User from '../models/user.model.js';
 import bcryptjs from 'bcryptjs';
 import {errorHandler} from '../utils/error.js';
 import jwt from 'jsonwebtoken';
-export const signup = async (req,res,next)=>{   
+export const signup = async (req,res,next)=>{
   const {username,email,password}=req.body;
   const hashpassword=bcryptjs.hashSync(password,10);
   const newUser=new  User ({username,email,password:hashpassword});
@@ -12,7 +12,7 @@ export const signup = async (req,res,next)=>{
   }catch(error){
      next(error);
   }
- 
+
 };
 
 export const Signin=async (req,res,next)=>{
@@ -24,7 +24,7 @@ export const Signin=async (req,res,next)=>{
     if(!validpassword) return next(errorHandler(404,'Wrong password!'));
     const token = jwt.sign({id: validUser._id},process.env.JWT_SECRET);
     const { password:pass,...rest}=validUser._doc;
-    res.cookie('access_token',token,{ httpOnly: true, secure: true, sameSite: 'none' }).status(200).json(rest);
+    res.cookie('access_token',token,{ httpOnly: true, secure: true, sameSite: 'none' }).status(200).json({ ...rest, access_token: token });
   }catch(error)
   {
     next(error);
@@ -38,9 +38,9 @@ export const Google = async (req, res, next) => {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
       const { password: pass, ...rest } = user._doc;
       res
-        .cookie('access_token', token, { httpOnly: true })
+        .cookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'none' })
         .status(200)
-        .json(rest);
+        .json({ ...rest, access_token: token });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
@@ -58,9 +58,9 @@ export const Google = async (req, res, next) => {
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
       const { password: pass, ...rest } = newUser._doc;
       res
-        .cookie('access_token', token, { httpOnly: true })
+        .cookie('access_token', token, { httpOnly: true, secure: true, sameSite: 'none' })
         .status(200)
-        .json(rest);
+        .json({ ...rest, access_token: token });
     }
   } catch (error) {
     next(error);
