@@ -42,10 +42,14 @@ app.use('/api/auth/',authRouter);
 app.use('/api/listing', listingRouter);
 app.use('/api/upload', uploadRouter);
 
-app.use(express.static(path.join(__dirname,'/client/dist')));
-app.get('*',(req,res)=>{
-    res.sendFile(path.join(__dirname,'client','dist','index.html'));
-})
+// Serve static files only in development (Vercel handles this via outputDirectory)
+if (process.env.NODE_ENV !== 'production') {
+  app.use(express.static(path.join(__dirname,'/client/dist')));
+  app.get('*',(req,res)=>{
+      res.sendFile(path.join(__dirname,'client','dist','index.html'));
+  });
+}
+
 app.use((err,req,res,next)=>{
     const statusCode=err.statusCode||500;
     const message=err.message||'internal server error';
