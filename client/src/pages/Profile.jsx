@@ -12,6 +12,7 @@ import {
 } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import ConfirmModal from '../components/ConfirmModal';
 export default function Profile() {
   const fileRef = useRef(null);
@@ -25,7 +26,15 @@ export default function Profile() {
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
   const [listingsFetched, setListingsFetched] = useState(false);
+  const [listingsLoading, setListingsLoading] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [passwordData, setPasswordData] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -57,7 +66,18 @@ export default function Profile() {
 
       setFormData({ ...formData, avatar: data.url });
       setFilePerc(100);
-      toast.success('Profile image uploaded!');
+
+      // Save avatar to database immediately
+      const updateRes = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar: data.url }),
+      });
+      const updateData = await updateRes.json();
+      if (updateData.success !== false) {
+        dispatch(updateUserSuccess(updateData));
+      }
+      toast.success('Profile image updated!');
     } catch (error) {
       setFileUploadError(true);
       toast.error('Image upload failed');
@@ -132,10 +152,62 @@ export default function Profile() {
     }
   };
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (!passwordData.oldPassword) {
+      toast.error('Current password is required');
+      return;
+    }
+    if (!passwordData.newPassword) {
+      toast.error('New password is required');
+      return;
+    }
+    if (!passwordData.confirmPassword) {
+      toast.error('Confirm new password is required');
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      toast.error('New password must be at least 6 characters');
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('Confirm new password does not match');
+      return;
+    }
+    if (passwordData.oldPassword === passwordData.newPassword) {
+      toast.error('New password must be different from current password');
+      return;
+    }
+    try {
+      setPasswordLoading(true);
+      const res = await fetch(`/api/user/change-password/${currentUser._id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          oldPassword: passwordData.oldPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        toast.error(data.message);
+        return;
+      }
+      toast.success('Password changed successfully!');
+      setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      setShowChangePassword(false);
+    } catch (error) {
+      toast.error('Failed to change password');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   const handleShowListings = async () => {
     try {
       setShowListingsError(false);
       setListingsFetched(false);
+      setListingsLoading(true);
       const res = await fetch(`/api/user/listings/${currentUser._id}`);
       const data = await res.json();
       if (data.success === false) {
@@ -146,10 +218,12 @@ export default function Profile() {
 
       setUserListings(data);
       setListingsFetched(true);
+      setListingsLoading(false);
       setTimeout(() => listingsRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch (error) {
       setShowListingsError(true);
       setListingsFetched(true);
+      setListingsLoading(false);
       setTimeout(() => listingsRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     }
   };
@@ -212,47 +286,27 @@ export default function Profile() {
           <h1 className='text-xl font-bold text-slate-800 mt-3'>{currentUser.username}</h1>
           <p className='text-sm text-gray-400'>{currentUser.email}</p>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className='mt-6 space-y-4'>
+          {/* User Info */}
+          <div className='mt-6 space-y-4'>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1.5'>Username</label>
-              <input
-                type='text'
-                placeholder='username'
-                defaultValue={currentUser.username}
-                id='username'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
-                onChange={handleChange}
-              />
+              <p className='w-full px-4 py-3 border border-gray-100 rounded-xl text-sm text-gray-600 bg-gray-50'>
+                {currentUser.username}
+              </p>
             </div>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1.5'>Email</label>
-              <input
-                type='email'
-                placeholder='email'
-                id='email'
-                defaultValue={currentUser.email}
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
-                onChange={handleChange}
-              />
+              <p className='w-full px-4 py-3 border border-gray-100 rounded-xl text-sm text-gray-600 bg-gray-50'>
+                {currentUser.email}
+              </p>
             </div>
-            <div>
-              <label className='block text-sm font-medium text-gray-700 mb-1.5'>Password</label>
-              <input
-                type='password'
-                placeholder='New password'
-                onChange={handleChange}
-                id='password'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
-              />
-            </div>
-
             <div className='flex gap-3 pt-2'>
               <button
-                disabled={loading}
-                className='flex-1 py-3 text-white font-semibold rounded-xl bg-teal-600 hover:bg-teal-700 transition-colors disabled:opacity-50 text-sm'
+                type='button'
+                onClick={() => setShowChangePassword(!showChangePassword)}
+                className='flex-1 py-3 text-white font-semibold rounded-xl bg-teal-600 hover:bg-teal-700 transition-colors text-sm'
               >
-                {loading ? 'Saving...' : 'Save Changes'}
+                {showChangePassword ? 'Cancel' : 'Change Password'}
               </button>
               <Link
                 className='flex-1 py-3 text-center text-white font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 transition-colors text-sm'
@@ -261,12 +315,71 @@ export default function Profile() {
                 Create Listing
               </Link>
             </div>
-          </form>
+          </div>
+
+          {/* Change Password Form */}
+          {showChangePassword && (
+            <form onSubmit={handleChangePassword} noValidate className='mt-6 pt-6 border-t border-gray-100 space-y-4'>
+              <h3 className='text-sm font-bold text-slate-800'>Change Password</h3>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Current Password</label>
+                <div className='relative'>
+                  <input
+                    type={showOldPassword ? 'text' : 'password'}
+                    placeholder='Enter current password'
+                    value={passwordData.oldPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
+                    className='w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
+                  />
+                  <button type='button' onClick={() => setShowOldPassword(!showOldPassword)} className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'>
+                    {showOldPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1.5'>New Password</label>
+                <div className='relative'>
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    placeholder='Enter new password (min 6 characters)'
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                    className='w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
+                  />
+                  <button type='button' onClick={() => setShowNewPassword(!showNewPassword)} className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'>
+                    {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Confirm New Password</label>
+                <div className='relative'>
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder='Confirm new password'
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    className='w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
+                  />
+                  <button type='button' onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'>
+                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
+              <button
+                type='submit'
+                disabled={passwordLoading}
+                className='w-full py-3 text-white font-semibold rounded-xl bg-slate-700 hover:bg-slate-800 transition-colors disabled:opacity-50 text-sm'
+              >
+                {passwordLoading ? 'Changing...' : 'Update Password'}
+              </button>
+            </form>
+          )}
 
           {/* Delete / Sign out */}
           <div className='flex justify-between mt-6 pt-6 border-t border-gray-100'>
             <button
-              onClick={handleDeleteUser}
+              onClick={() => setShowDeleteModal(true)}
               className='text-sm text-gray-400 hover:text-red-500 transition-colors font-medium'
             >
               Delete account
@@ -297,9 +410,17 @@ export default function Profile() {
       <div className='text-center mt-8'>
         <button
           onClick={handleShowListings}
-          className='text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors'
+          disabled={listingsLoading}
+          className='text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors disabled:opacity-50'
         >
-          View My Listings
+          {listingsLoading ? (
+            <span className='flex items-center justify-center gap-2'>
+              <span className='w-4 h-4 border-2 border-teal-200 border-t-teal-600 rounded-full animate-spin'></span>
+              Please wait...
+            </span>
+          ) : (
+            'View My Listings'
+          )}
         </button>
         {showListingsError && <p className='mt-2 text-sm text-red-500'>Error loading listings</p>}
       </div>
@@ -371,11 +492,24 @@ export default function Profile() {
         <ConfirmModal
           title='Sign Out'
           message='Are you sure you want to sign out?'
+          confirmText='Yes, Sign out'
           onConfirm={() => {
             setShowSignOutModal(false);
             handleSignOut();
           }}
           onCancel={() => setShowSignOutModal(false)}
+        />
+      )}
+      {showDeleteModal && (
+        <ConfirmModal
+          title='Delete Account'
+          message='Are you sure you want to delete your account? This action cannot be undone.'
+          confirmText='Yes, Delete'
+          onConfirm={() => {
+            setShowDeleteModal(false);
+            handleDeleteUser();
+          }}
+          onCancel={() => setShowDeleteModal(false)}
         />
       )}
     </div>

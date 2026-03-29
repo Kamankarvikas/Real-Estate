@@ -1,4 +1,4 @@
-export default function ConfirmModal({ title, message, onConfirm, onCancel }) {
+export default function ConfirmModal({ title, message, onConfirm, onCancel, confirmText = 'Yes, Confirm' }) {
   return (
     <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50' onClick={onCancel}>
       <div
@@ -18,7 +18,7 @@ export default function ConfirmModal({ title, message, onConfirm, onCancel }) {
             onClick={onConfirm}
             className='px-5 py-2.5 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors'
           >
-            Yes, Sign out
+            {confirmText}
           </button>
         </div>
       </div>

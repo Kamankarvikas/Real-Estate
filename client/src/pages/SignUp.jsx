@@ -3,8 +3,10 @@ import { useState } from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import OAuth from '../components/OAuth';
 import toast from 'react-hot-toast';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 export default function Signout() {
   const[formData,setFormData]=useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const [error,setError]=useState(null);
   const [loading,setloading]=useState(false);
   const navigate = useNavigate();
@@ -169,8 +171,13 @@ export default function Signout() {
             </div>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1.5'>Password <span className='text-red-400'>*</span></label>
-              <input type="password" placeholder='Enter your password'
-                className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors bg-white' id='password' onChange={handleChange}/>
+              <div className='relative'>
+                <input type={showPassword ? 'text' : 'password'} placeholder='Enter your password'
+                  className='w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors bg-white' id='password' onChange={handleChange}/>
+                <button type='button' onClick={() => setShowPassword(!showPassword)} className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'>
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
 
             <button

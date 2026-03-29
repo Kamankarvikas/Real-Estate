@@ -64,6 +64,31 @@ export const getUserListings = async (req, res, next) => {
   }
 };
 
+export const changePassword = async (req, res, next) => {
+  if (req.user.id !== req.params.id)
+    return next(errorHandler(401, 'You can only update your own account!'));
+  try {
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword)
+      return next(errorHandler(400, 'Please provide old and new password'));
+    if (newPassword.length < 6)
+      return next(errorHandler(400, 'New password must be at least 6 characters'));
+
+    const user = await User.findById(req.params.id);
+    if (!user) return next(errorHandler(404, 'User not found!'));
+
+    const isMatch = bcryptjs.compareSync(oldPassword, user.password);
+    if (!isMatch) return next(errorHandler(401, 'Current password is incorrect'));
+
+    user.password = bcryptjs.hashSync(newPassword, 10);
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Password changed successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getUser = async (req, res, next) => {
   try {
     
