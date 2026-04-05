@@ -10,7 +10,11 @@ import cookieParser from 'cookie-parser';
 dotenv.config();
 
 mongoose
-.connect(process.env.MONGO)
+.connect(process.env.MONGO, {
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+})
 .then(()=>{
     console.log("connected the mongodb");
 })

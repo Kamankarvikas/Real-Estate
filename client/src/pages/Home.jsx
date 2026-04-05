@@ -51,39 +51,28 @@ export default function Home() {
   const stat3 = useCountUp(50, 1500, loadingDone);
 
   useEffect(() => {
-    const fetchOfferListings = async () => {
+    const fetchAllListings = async () => {
       try {
-        const res = await fetch('/api/listing/get?offer=true&limit=4');
-        const data = await res.json();
-        setOfferListings(data);
-        fetchRentListings();
+        const [offerRes, rentRes, saleRes] = await Promise.all([
+          fetch('/api/listing/get?offer=true&limit=4'),
+          fetch('/api/listing/get?type=rent&limit=4'),
+          fetch('/api/listing/get?type=sale&limit=4'),
+        ]);
+        const [offerData, rentData, saleData] = await Promise.all([
+          offerRes.json(),
+          rentRes.json(),
+          saleRes.json(),
+        ]);
+        setOfferListings(offerData);
+        setRentListings(rentData);
+        setSaleListings(saleData);
       } catch (error) {
+        console.log(error);
+      } finally {
         setLoadingDone(true);
       }
     };
-    const fetchRentListings = async () => {
-      try {
-        const res = await fetch('/api/listing/get?type=rent&limit=4');
-        const data = await res.json();
-        setRentListings(data);
-        fetchSaleListings();
-      } catch (error) {
-        setLoadingDone(true);
-      }
-    };
-
-    const fetchSaleListings = async () => {
-      try {
-        const res = await fetch('/api/listing/get?type=sale&limit=4');
-        const data = await res.json();
-        setSaleListings(data);
-        setLoadingDone(true);
-      } catch (error) {
-        log(error);
-        setLoadingDone(true);
-      }
-    };
-    fetchOfferListings();
+    fetchAllListings();
   }, []);
 
   // Combine all listings and deduplicate by _id for the carousel

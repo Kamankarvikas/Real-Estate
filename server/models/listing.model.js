@@ -53,5 +53,9 @@ const listingSchema = new mongoose.Schema(
 
    },{timestamps:true}
 )
+listingSchema.index({ offer: 1, createdAt: -1 });
+listingSchema.index({ type: 1, createdAt: -1 });
+listingSchema.index({ name: 'text' });
+
 const Listing = mongoose.model('Listing',listingSchema);
 export default Listing;
