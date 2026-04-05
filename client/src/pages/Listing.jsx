@@ -30,6 +30,10 @@ export default function Listing() {
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [params.listingId]);
+
+  useEffect(() => {
     const fetchListing = async () => {
       try {
         setLoading(true);
