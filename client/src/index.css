@@ -60,20 +60,21 @@ body {
   animation: spin-reverse 1.2s linear infinite;
 }
 
-/* Swiper custom arrows - hidden on mobile */
+/* Swiper custom arrows */
 .swiper-button-next,
 .swiper-button-prev {
   color: white !important;
   background: rgba(0, 0, 0, 0.35);
-  width: 44px !important;
-  height: 44px !important;
+  width: 36px !important;
+  height: 36px !important;
   border-radius: 50%;
-  display: none !important;
+  display: flex !important;
 }
 @media (min-width: 640px) {
   .swiper-button-next,
   .swiper-button-prev {
-    display: flex !important;
+    width: 44px !important;
+    height: 44px !important;
   }
 }
 .swiper-button-next::after,

@@ -161,11 +161,15 @@ export default function CreateListing() {
       setLoading(false);
       if (data.success === false) {
         setError(data.message);
+        toast.error(data.message || 'Failed to update listing');
+        return;
       }
+      toast.success('Listing updated successfully!');
       navigate('/my-listings');
     } catch (error) {
       setError(error.message);
       setLoading(false);
+      toast.error('Something went wrong. Please try again.');
     }
   };
   return (
