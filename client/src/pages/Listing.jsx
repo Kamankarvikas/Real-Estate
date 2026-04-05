@@ -133,7 +133,7 @@ export default function Listing() {
                 </div>
 
                 {/* Title & Price */}
-                <h1 className='text-2xl sm:text-3xl font-bold text-slate-800 mb-2'>
+                <h1 className='text-2xl sm:text-3xl font-bold text-slate-800 mb-2 break-words'>
                   {listing.name}
                 </h1>
                 <div className='flex items-baseline gap-2 mb-4'>
@@ -183,7 +183,7 @@ export default function Listing() {
                 {/* Description */}
                 <div className='mb-6'>
                   <h2 className='text-lg font-bold text-slate-800 mb-3'>About this property</h2>
-                  <p className='text-gray-600 text-sm leading-relaxed'>
+                  <p className='text-gray-600 text-sm leading-relaxed break-words whitespace-pre-wrap'>
                     {listing.description}
                   </p>
                 </div>
