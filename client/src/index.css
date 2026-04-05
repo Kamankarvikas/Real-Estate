@@ -52,6 +52,9 @@ body {
 .hero-delay-5 { animation-delay: 2.0s; }
 
 /* Loader reverse spin */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 @keyframes spin-reverse {
   from { transform: rotate(0deg); }
   to { transform: rotate(-360deg); }
