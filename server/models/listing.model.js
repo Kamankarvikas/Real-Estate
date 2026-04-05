@@ -25,6 +25,10 @@ const listingSchema = new mongoose.Schema(
         type:Number,
         required:true,
     },
+    bathrooms:{
+        type:Number,
+        required:true,
+    },
     furnished:{
         type:Boolean,
         required:true,
@@ -47,6 +51,18 @@ const listingSchema = new mongoose.Schema(
 
     },
     userRef:{
+        type:String,
+        required:true,
+    },
+    ownerName:{
+        type:String,
+        default:'',
+    },
+    ownerEmail:{
+        type:String,
+        default:'',
+    },
+    ownerPhone:{
         type:String,
         required:true,
     },

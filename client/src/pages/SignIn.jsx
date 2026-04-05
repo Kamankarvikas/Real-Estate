@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import OAuth from '../components/OAuth';
 import {signInStart,signInSuccess,signInFailure} from '../redux/user/userSlice'
@@ -14,6 +14,8 @@ export default function Signin() {
  const{loading , error}=useSelector((state)=>state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get('redirect') || '/';
 
    const handleChange=(e)=>{
     setFormData({
@@ -63,7 +65,7 @@ export default function Signin() {
       setNotVerified(false);
       dispatch(signInSuccess(data));
       toast.success('Welcome back! Signed in successfully');
-      navigate('/');
+      navigate(redirect);
 
     }catch(error){
 
@@ -198,7 +200,7 @@ export default function Signin() {
               <div className='flex-1 h-px bg-gray-200'></div>
             </div>
 
-            <OAuth/>
+            <OAuth redirect={redirect}/>
           </form>
 
           {notVerified && (
@@ -216,7 +218,7 @@ export default function Signin() {
 
           <p className='text-center text-sm text-gray-500 mt-8'>
             Don't have an account?{' '}
-            <Link to="/sign-Up" className='font-semibold text-teal-600 hover:text-teal-800 transition-colors'>
+            <Link to={`/sign-Up${redirect !== '/' ? `?redirect=${redirect}` : ''}`} className='font-semibold text-teal-600 hover:text-teal-800 transition-colors'>
               Create account
             </Link>
           </p>

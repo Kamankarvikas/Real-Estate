@@ -156,9 +156,9 @@ export default function Home() {
                       <div className='max-w-6xl mx-auto'>
                         <p className='text-white text-lg sm:text-xl font-bold'>{listing.name}</p>
                         <p className='text-gray-300 text-sm mt-1'>
-                          ${listing.offer
-                            ? listing.discountPrice.toLocaleString('en-US')
-                            : listing.regularPrice.toLocaleString('en-US')}
+                          ₹{listing.offer
+                            ? listing.discountPrice.toLocaleString('en-IN')
+                            : listing.regularPrice.toLocaleString('en-IN')}
                           {listing.type === 'rent' && ' / month'}
                         </p>
                       </div>

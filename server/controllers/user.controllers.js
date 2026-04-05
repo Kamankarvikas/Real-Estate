@@ -52,15 +52,42 @@ export const deleteUser = async (req, res, next) => {
 };
 
 export const getUserListings = async (req, res, next) => {
-  if (req.user.id === req.params.id) {
-    try {
-      const listings = await Listing.find({ userRef: req.params.id });
-      res.status(200).json(listings);
-    } catch (error) {
-      next(error);
-    }
-  } else {
+  if (req.user.id !== req.params.id) {
     return next(errorHandler(401, 'You can only view your own listings!'));
+  }
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+    const searchTerm = req.query.search || '';
+    const type = req.query.type || '';
+    const skip = (page - 1) * pageSize;
+
+    const query = { userRef: req.params.id };
+
+    if (searchTerm) {
+      query.name = { $regex: searchTerm, $options: 'i' };
+    }
+
+    if (type && type !== 'all') {
+      query.type = type;
+    }
+
+    const total = await Listing.countDocuments(query);
+    const listings = await Listing.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(pageSize)
+      .lean();
+
+    res.status(200).json({
+      listings,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    });
+  } catch (error) {
+    next(error);
   }
 };
 

@@ -114,6 +114,12 @@ export default function CreateListing() {
       });
     }
 
+    if (e.target.id === 'ownerPhone') {
+      const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+      setFormData({ ...formData, ownerPhone: value });
+      return;
+    }
+
     if (
       e.target.type === 'number' ||
       e.target.type === 'text' ||
@@ -133,6 +139,10 @@ export default function CreateListing() {
         return setError('You must upload at least one image');
       if (+formData.regularPrice < +formData.discountPrice)
         return setError('Discount price must be lower than regular price');
+      if (!formData.ownerPhone || formData.ownerPhone.length !== 10) {
+        toast.error('Please enter a valid 10-digit phone number');
+        return;
+      }
       setLoading(true);
       setError(false);
       const res = await fetch(`/api/listing/update/${params.listingId}`, {
@@ -143,6 +153,8 @@ export default function CreateListing() {
         body: JSON.stringify({
           ...formData,
           userRef: currentUser._id,
+          ownerName: currentUser.username,
+          ownerEmail: currentUser.email,
         }),
       });
       const data = await res.json();
@@ -150,7 +162,7 @@ export default function CreateListing() {
       if (data.success === false) {
         setError(data.message);
       }
-      navigate('/profile');
+      navigate('/my-listings');
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -161,8 +173,16 @@ export default function CreateListing() {
       <div className='max-w-5xl mx-auto px-4 sm:px-6 py-10'>
         {/* Header */}
         <div className='mb-8'>
-          <h1 className='text-2xl lg:text-3xl font-bold text-slate-800'>Update Listing</h1>
-          <p className='text-gray-500 text-sm mt-1'>Modify the details of your property listing</p>
+          <button
+            type='button'
+            onClick={() => navigate('/my-listings')}
+            className='inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-teal-600 transition-colors mb-4'
+          >
+            <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' /></svg>
+            Back to Listings
+          </button>
+          <h1 className='text-2xl lg:text-3xl font-bold text-slate-800 text-center'>Update Listing</h1>
+          <p className='text-gray-500 text-sm mt-1 text-center'>Modify the details of your property listing</p>
         </div>
 
         <form onSubmit={handleSubmit} className='grid lg:grid-cols-5 gap-6'>
@@ -192,9 +212,11 @@ export default function CreateListing() {
                   className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors min-h-[120px] resize-none'
                   id='description'
                   required
+                  maxLength='500'
                   onChange={handleChange}
                   value={formData.description}
                 />
+                <p className='text-xs text-gray-400 mt-1'>{(formData.description || '').length}/500 characters</p>
               </div>
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-1.5'>Address</label>
@@ -207,6 +229,22 @@ export default function CreateListing() {
                   onChange={handleChange}
                   value={formData.address}
                 />
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Contact Phone Number <span className='text-red-400'>*</span></label>
+                <input
+                  type='text'
+                  inputMode='numeric'
+                  placeholder='e.g. 9876543210'
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
+                  id='ownerPhone'
+                  maxLength='10'
+                  onChange={handleChange}
+                  value={formData.ownerPhone || ''}
+                />
+                <p className='text-xs text-gray-400 mt-1'>
+                  {(formData.ownerPhone || '').length}/10 digits — Visible to users who want to contact you
+                </p>
               </div>
             </div>
 
@@ -252,12 +290,12 @@ export default function CreateListing() {
                   <input type='number' id='bathrooms' min='1' max='10' required className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-400' onChange={handleChange} value={formData.bathrooms} />
                 </div>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Price {formData.type === 'rent' ? '($/mo)' : '($)'}</label>
+                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Price {formData.type === 'rent' ? '(₹/mo)' : '(₹)'}</label>
                   <input type='number' id='regularPrice' min='50' max='10000000' required className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-400' onChange={handleChange} value={formData.regularPrice} />
                 </div>
                 {formData.offer && (
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1.5'>Discount {formData.type === 'rent' ? '($/mo)' : '($)'}</label>
+                    <label className='block text-sm font-medium text-gray-700 mb-1.5'>Discount {formData.type === 'rent' ? '(₹/mo)' : '(₹)'}</label>
                     <input type='number' id='discountPrice' min='0' max='10000000' required className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-400' onChange={handleChange} value={formData.discountPrice} />
                   </div>
                 )}

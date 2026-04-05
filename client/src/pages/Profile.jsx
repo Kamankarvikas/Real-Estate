@@ -16,17 +16,12 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import ConfirmModal from '../components/ConfirmModal';
 export default function Profile() {
   const fileRef = useRef(null);
-  const listingsRef = useRef(null);
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
-  const [showListingsError, setShowListingsError] = useState(false);
-  const [userListings, setUserListings] = useState([]);
-  const [listingsFetched, setListingsFetched] = useState(false);
-  const [listingsLoading, setListingsLoading] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [passwordData, setPasswordData] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
   const [passwordLoading, setPasswordLoading] = useState(false);
@@ -203,51 +198,6 @@ export default function Profile() {
     }
   };
 
-  const handleShowListings = async () => {
-    try {
-      setShowListingsError(false);
-      setListingsFetched(false);
-      setListingsLoading(true);
-      const res = await fetch(`/api/user/listings/${currentUser._id}`);
-      const data = await res.json();
-      if (data.success === false) {
-        setShowListingsError(true);
-        setListingsFetched(true);
-        return;
-      }
-
-      setUserListings(data);
-      setListingsFetched(true);
-      setListingsLoading(false);
-      setTimeout(() => listingsRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-    } catch (error) {
-      setShowListingsError(true);
-      setListingsFetched(true);
-      setListingsLoading(false);
-      setTimeout(() => listingsRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-    }
-  };
-
-  const handleListingDelete = async (listingId) => {
-    try {
-      const res = await fetch(`/api/listing/delete/${listingId}`, {
-        method: 'DELETE',
-      });
-      const data = await res.json();
-      if (data.success === false) {
-        console.log(data.message);
-        return;
-      }
-
-      setUserListings((prev) =>
-        prev.filter((listing) => listing._id !== listingId)
-      );
-      toast.success('Listing deleted successfully');
-    } catch (error) {
-      console.log(error.message);
-      toast.error('Failed to delete listing');
-    }
-  };
   return (
     <div className='max-w-2xl mx-auto px-4 py-10'>
       {/* Profile Card */}
@@ -300,27 +250,28 @@ export default function Profile() {
                 {currentUser.email}
               </p>
             </div>
-            <div className='flex gap-3 pt-2'>
+          </div>
+
+          {/* Security Section */}
+          <div className='mt-6 pt-6 border-t border-gray-100'>
+            <div className='flex items-center justify-between mb-4'>
+              <div>
+                <h3 className='text-sm font-bold text-slate-800'>Security</h3>
+                <p className='text-xs text-gray-400 mt-0.5'>Manage your password</p>
+              </div>
               <button
                 type='button'
                 onClick={() => setShowChangePassword(!showChangePassword)}
-                className='flex-1 py-3 text-white font-semibold rounded-xl bg-teal-600 hover:bg-teal-700 transition-colors text-sm'
+                className='text-sm font-semibold text-teal-600 hover:text-teal-700 transition-colors'
               >
                 {showChangePassword ? 'Cancel' : 'Change Password'}
               </button>
-              <Link
-                className='flex-1 py-3 text-center text-white font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 transition-colors text-sm'
-                to={'/create-listing'}
-              >
-                Create Listing
-              </Link>
             </div>
           </div>
 
           {/* Change Password Form */}
           {showChangePassword && (
-            <form onSubmit={handleChangePassword} noValidate className='mt-6 pt-6 border-t border-gray-100 space-y-4'>
-              <h3 className='text-sm font-bold text-slate-800'>Change Password</h3>
+            <form onSubmit={handleChangePassword} noValidate className='space-y-4'>
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-1.5'>Current Password</label>
                 <div className='relative'>
@@ -376,19 +327,25 @@ export default function Profile() {
             </form>
           )}
 
-          {/* Delete / Sign out */}
-          <div className='flex justify-between mt-6 pt-6 border-t border-gray-100'>
-            <button
-              onClick={() => setShowDeleteModal(true)}
-              className='text-sm text-gray-400 hover:text-red-500 transition-colors font-medium'
-            >
-              Delete account
-            </button>
+          {/* Sign out & Delete */}
+          <div className='mt-6 pt-6 border-t border-gray-100 space-y-3'>
             <button
               onClick={() => setShowSignOutModal(true)}
-              className='text-sm text-gray-400 hover:text-red-500 transition-colors font-medium'
+              className='flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors'
             >
-              Sign out
+              <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1' />
+              </svg>
+              Sign Out
+            </button>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className='flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold text-red-600 border border-red-200 hover:bg-red-50 rounded-xl transition-colors'
+            >
+              <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
+              </svg>
+              Delete Account
             </button>
           </div>
 
@@ -406,88 +363,6 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Show Listings Button */}
-      <div className='text-center mt-8'>
-        <button
-          onClick={handleShowListings}
-          disabled={listingsLoading}
-          className='text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors disabled:opacity-50'
-        >
-          {listingsLoading ? (
-            <span className='flex items-center justify-center gap-2'>
-              <span className='w-4 h-4 border-2 border-teal-200 border-t-teal-600 rounded-full animate-spin'></span>
-              Please wait...
-            </span>
-          ) : (
-            'View My Listings'
-          )}
-        </button>
-        {showListingsError && <p className='mt-2 text-sm text-red-500'>Error loading listings</p>}
-      </div>
-
-      {/* Listings section scroll target */}
-      <div ref={listingsRef}></div>
-
-      {/* Empty state */}
-      {listingsFetched && userListings.length === 0 && !showListingsError && (
-        <div className='mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center'>
-          <div className='w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-4'>
-            <svg className='w-7 h-7 text-teal-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z' />
-            </svg>
-          </div>
-          <h3 className='text-lg font-bold text-slate-800 mb-1'>No Listings Yet</h3>
-          <p className='text-sm text-gray-400 mb-6 max-w-xs mx-auto'>You haven't created any listings yet. Start listing your property to reach potential buyers and renters.</p>
-          <Link
-            to='/create-listing'
-            className='inline-block bg-teal-600 text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-teal-700 transition-colors text-sm'
-          >
-            Create Your First Listing
-          </Link>
-        </div>
-      )}
-
-      {/* User Listings */}
-      {userListings && userListings.length > 0 && (
-        <div className='mt-8'>
-          <h2 className='text-lg font-bold text-slate-800 mb-4'>Your Listings</h2>
-          <div className='space-y-3'>
-            {userListings.map((listing) => (
-              <div
-                key={listing._id}
-                className='flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow'
-              >
-                <Link to={`/listing/${listing._id}`} className='flex-shrink-0'>
-                  <div
-                    className='w-20 h-16 rounded-lg bg-gray-200 bg-center bg-cover'
-                    style={{ backgroundImage: `url(${listing.imageUrls[0]})` }}
-                  ></div>
-                </Link>
-                <Link
-                  className='flex-1 font-medium text-sm text-gray-800 truncate hover:text-teal-600 transition-colors'
-                  to={`/listing/${listing._id}`}
-                >
-                  <p>{listing.name}</p>
-                </Link>
-
-                <div className='flex items-center gap-2 flex-shrink-0'>
-                  <Link to={`/update-listing/${listing._id}`}>
-                    <button className='text-xs font-semibold text-teal-600 hover:text-teal-800 px-3 py-1.5 bg-teal-50 rounded-lg transition-colors'>
-                      Edit
-                    </button>
-                  </Link>
-                  <button
-                    onClick={() => handleListingDelete(listing._id)}
-                    className='text-xs font-semibold text-red-500 hover:text-red-700 px-3 py-1.5 bg-red-50 rounded-lg transition-colors'
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
       {showSignOutModal && (
         <ConfirmModal
           title='Sign Out'

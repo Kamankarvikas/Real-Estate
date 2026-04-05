@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
 import { useSelector } from 'react-redux';
@@ -10,14 +10,13 @@ import {
   FaBath,
   FaBed,
   FaChair,
-  FaMapMarkedAlt,
   FaMapMarkerAlt,
   FaParking,
   FaShare,
+  FaTag,
+  FaCheckCircle,
 } from 'react-icons/fa';
 import Contact from '../components/Contact';
-
-// https://sabe.io/blog/javascript-format-numbers-commas#:~:text=The%20best%20way%20to%20format,format%20the%20number%20with%20commas.
 
 export default function Listing() {
   SwiperCore.use([Navigation]);
@@ -27,7 +26,8 @@ export default function Listing() {
   const [copied, setCopied] = useState(false);
   const [contact, setContact] = useState(false);
   const params = useParams();
-  const  currentUser  = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -52,100 +52,180 @@ export default function Listing() {
   }, [params.listingId]);
 
   return (
-    <main>
-      {loading && <p className='text-2xl text-center my-7'>Loading...</p>}
+    <main className='bg-gray-50 min-h-screen'>
+      {loading && (
+        <div className='flex items-center justify-center py-20'>
+          <div className='text-center'>
+            <div className='w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4'></div>
+            <p className='text-gray-500 text-sm'>Loading property details...</p>
+          </div>
+        </div>
+      )}
       {error && (
-        <p className='text-2xl text-center my-7'>Something went wrong!</p>
+        <div className='flex items-center justify-center py-20'>
+          <div className='text-center'>
+            <p className='text-xl font-semibold text-slate-800 mb-2'>Something went wrong</p>
+            <p className='text-gray-500 text-sm'>Unable to load this property. Please try again.</p>
+          </div>
+        </div>
       )}
       {listing && !loading && !error && (
         <div>
-          <Swiper navigation>
-            {listing.imageUrls.map((url) => (
-              <SwiperSlide key={url}>
-                <div
-                  className='h-[550px]'
-                  style={{
-                    background: `url(${url}) center no-repeat`,
-                    backgroundSize: 'cover',
-                  }}
-                ></div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-          <div className='fixed top-[13%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer'>
-            <FaShare
-              className='text-slate-500'
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                setCopied(true);
-                setTimeout(() => {
-                  setCopied(false);
-                }, 2000);
-              }}
-            />
-          </div>
-          {copied && (
-            <p className='fixed top-[23%] right-[5%] z-10 rounded-md bg-slate-100 p-2'>
-              Link copied!
-            </p>
-          )}
-          <div className='flex flex-col max-w-4xl gap-4 p-3 mx-auto my-7'>
-            <p className='text-2xl font-semibold'>
-              {listing.name} - ${' '}
-              {listing.offer
-                ? listing.discountPrice.toLocaleString('en-US')
-                : listing.regularPrice.toLocaleString('en-US')}
-              {listing.type === 'rent' && ' / month'}
-            </p>
-            <p className='flex items-center gap-2 mt-6 text-sm text-slate-600'>
-              <FaMapMarkerAlt className='text-green-700' />
-              {listing.address}
-            </p>
-            <div className='flex gap-4'>
-              <p className='bg-red-900 w-full max-w-[200px] text-white text-center p-1 rounded-md'>
-                {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
-              </p>
-              {listing.offer && (
-                <p className='bg-green-900 w-full max-w-[200px] text-white text-center p-1 rounded-md'>
-                  ${+listing.regularPrice - +listing.discountPrice} OFF
-                </p>
+          {/* Image Carousel */}
+          <div className='relative'>
+            <Swiper navigation>
+              {listing.imageUrls.map((url) => (
+                <SwiperSlide key={url}>
+                  <div
+                    className='h-[350px] sm:h-[450px] lg:h-[500px]'
+                    style={{
+                      background: `url(${url}) center no-repeat`,
+                      backgroundSize: 'cover',
+                    }}
+                  ></div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+
+            {/* Share button */}
+            <div className='absolute top-4 right-4 z-10'>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                className='w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors'
+              >
+                <FaShare className='text-slate-600 text-sm' />
+              </button>
+              {copied && (
+                <div className='absolute top-14 right-0 bg-slate-800 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-lg whitespace-nowrap'>
+                  Link copied!
+                </div>
               )}
             </div>
-            <p className='text-slate-800'>
-              <span className='font-semibold text-black'>Description - </span>
-              {listing.description}
-            </p>
-            <ul className='flex flex-wrap items-center gap-4 text-sm font-semibold text-green-900 sm:gap-6'>
-              <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaBed className='text-lg' />
-                {(listing.bedrooms || 0) > 1
-                  ? `${listing.bedrooms} beds `
-                  : `${listing.bedrooms || 0} bed `}
-              </li>
-              <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaBath className='text-lg' />
-                {(listing.bathrooms || 0) > 1
-                  ? `${listing.bathrooms} baths `
-                  : `${listing.bathrooms || 0} bath `}
-              </li>
-              <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaParking className='text-lg' />
-                {listing.parking ? 'Parking spot' : 'No Parking'}
-              </li>
-              <li className='flex items-center gap-1 whitespace-nowrap '>
-                <FaChair className='text-lg' />
-                {listing.furnished ? 'Furnished' : 'Unfurnished'}
-              </li>
-            </ul>
-            {currentUser && listing.userRef !== currentUser._id && !contact && (
-              <button
-                onClick={() => setContact(true)}
-                className='p-3 text-white uppercase rounded-lg bg-slate-700 hover:opacity-95'
-              >
-                Contact Owner
-              </button>
-            )}
-            {contact && <Contact listing={listing} />}
+
+            {/* Image count badge */}
+            <div className='absolute bottom-4 right-4 z-10 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full'>
+              {listing.imageUrls.length} photos
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className='max-w-6xl mx-auto px-4 sm:px-6 py-8'>
+            <div className='flex flex-col lg:flex-row gap-8'>
+
+              {/* Left Column - Property Details */}
+              <div className='flex-1'>
+                {/* Badges */}
+                <div className='flex flex-wrap gap-2 mb-4'>
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${listing.type === 'rent' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-700'}`}>
+                    <FaTag className='text-[10px]' />
+                    {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
+                  </span>
+                  {listing.offer && (
+                    <span className='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700'>
+                      <FaCheckCircle className='text-[10px]' />
+                      Special Offer
+                    </span>
+                  )}
+                </div>
+
+                {/* Title & Price */}
+                <h1 className='text-2xl sm:text-3xl font-bold text-slate-800 mb-2'>
+                  {listing.name}
+                </h1>
+                <div className='flex items-baseline gap-2 mb-4'>
+                  <p className='text-2xl sm:text-3xl font-bold text-teal-600'>
+                    ₹{listing.offer
+                      ? listing.discountPrice.toLocaleString('en-IN')
+                      : listing.regularPrice.toLocaleString('en-IN')}
+                    {listing.type === 'rent' && <span className='text-base font-normal text-gray-500'> / month</span>}
+                  </p>
+                  {listing.offer && (
+                    <p className='text-base text-gray-400 line-through'>
+                      ₹{listing.regularPrice.toLocaleString('en-IN')}
+                    </p>
+                  )}
+                </div>
+
+                {/* Address */}
+                <div className='flex items-start gap-2 mb-6 pb-6 border-b border-gray-200'>
+                  <FaMapMarkerAlt className='text-teal-600 mt-0.5 flex-shrink-0' />
+                  <p className='text-gray-600 text-sm'>{listing.address}</p>
+                </div>
+
+                {/* Features Grid */}
+                <div className='grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 pb-6 border-b border-gray-200'>
+                  <div className='bg-white rounded-xl p-4 text-center border border-gray-100'>
+                    <FaBed className='text-teal-600 text-xl mx-auto mb-2' />
+                    <p className='text-lg font-bold text-slate-800'>{listing.bedrooms || 0}</p>
+                    <p className='text-xs text-gray-500'>{(listing.bedrooms || 0) > 1 ? 'Bedrooms' : 'Bedroom'}</p>
+                  </div>
+                  <div className='bg-white rounded-xl p-4 text-center border border-gray-100'>
+                    <FaBath className='text-teal-600 text-xl mx-auto mb-2' />
+                    <p className='text-lg font-bold text-slate-800'>{listing.bathrooms || 0}</p>
+                    <p className='text-xs text-gray-500'>{(listing.bathrooms || 0) > 1 ? 'Bathrooms' : 'Bathroom'}</p>
+                  </div>
+                  <div className='bg-white rounded-xl p-4 text-center border border-gray-100'>
+                    <FaParking className='text-teal-600 text-xl mx-auto mb-2' />
+                    <p className='text-lg font-bold text-slate-800'>{listing.parking ? 'Yes' : 'No'}</p>
+                    <p className='text-xs text-gray-500'>Parking</p>
+                  </div>
+                  <div className='bg-white rounded-xl p-4 text-center border border-gray-100'>
+                    <FaChair className='text-teal-600 text-xl mx-auto mb-2' />
+                    <p className='text-lg font-bold text-slate-800'>{listing.furnished ? 'Yes' : 'No'}</p>
+                    <p className='text-xs text-gray-500'>Furnished</p>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className='mb-6'>
+                  <h2 className='text-lg font-bold text-slate-800 mb-3'>About this property</h2>
+                  <p className='text-gray-600 text-sm leading-relaxed'>
+                    {listing.description}
+                  </p>
+                </div>
+
+                {/* Offer savings */}
+                {listing.offer && (
+                  <div className='bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6'>
+                    <p className='text-emerald-800 text-sm font-semibold'>
+                      You save ₹{(+listing.regularPrice - +listing.discountPrice).toLocaleString('en-IN')} with this offer!
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column - Contact */}
+              <div className='lg:w-[380px] flex-shrink-0'>
+                <div className='lg:sticky lg:top-6'>
+                  {listing.userRef !== (currentUser?._id) && !contact && (
+                    <div className='bg-white border border-gray-200 rounded-2xl p-6 shadow-sm'>
+                      <h3 className='text-lg font-bold text-slate-800 mb-2'>Interested in this property?</h3>
+                      <p className='text-sm text-gray-500 mb-5'>Get in touch with the property owner to schedule a visit or ask questions.</p>
+                      <button
+                        onClick={() => {
+                          if (!currentUser) {
+                            navigate(`/sign-in?redirect=/listing/${params.listingId}`);
+                            return;
+                          }
+                          setContact(true);
+                        }}
+                        className='w-full py-3.5 text-white font-semibold rounded-xl bg-teal-600 hover:bg-teal-700 transition-colors text-sm'
+                      >
+                        Contact Owner
+                      </button>
+                      {!currentUser && (
+                        <p className='text-xs text-gray-400 text-center mt-3'>Sign in required to contact owner</p>
+                      )}
+                    </div>
+                  )}
+                  {contact && <Contact listing={listing} />}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

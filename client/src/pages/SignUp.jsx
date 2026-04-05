@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import OAuth from '../components/OAuth';
 import toast from 'react-hot-toast';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -12,6 +12,8 @@ export default function Signout() {
   const [registered, setRegistered] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get('redirect') || '/';
    const handleChange=(e)=>{
     setFormData({
       ...formData,
@@ -193,7 +195,7 @@ export default function Signout() {
               </button>
 
               <div className='mt-6 pt-6 border-t border-gray-100'>
-                <Link to='/sign-in' className='text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors'>
+                <Link to={`/sign-in${redirect !== '/' ? `?redirect=${redirect}` : ''}`} className='text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors'>
                   Back to Sign In
                 </Link>
               </div>
@@ -327,12 +329,12 @@ export default function Signout() {
               <div className='flex-1 h-px bg-gray-200'></div>
             </div>
 
-            <OAuth/>
+            <OAuth redirect={redirect}/>
           </form>
 
           <p className='text-center text-sm text-gray-500 mt-8'>
             Already have an account?{' '}
-            <Link to="/sign-in" className='font-semibold text-teal-600 hover:text-teal-800 transition-colors'>
+            <Link to={`/sign-in${redirect !== '/' ? `?redirect=${redirect}` : ''}`} className='font-semibold text-teal-600 hover:text-teal-800 transition-colors'>
               Sign in
             </Link>
           </p>

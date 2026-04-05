@@ -20,6 +20,7 @@ export default function CreateListing() {
     offer: false,
     parking: false,
     furnished: false,
+    ownerPhone: '',
   });
   const [imageUploadError, setImageUploadError] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -97,6 +98,12 @@ export default function CreateListing() {
       });
     }
 
+    if (e.target.id === 'ownerPhone') {
+      const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+      setFormData({ ...formData, ownerPhone: value });
+      return;
+    }
+
     if (
       e.target.type === 'number' ||
       e.target.type === 'text' ||
@@ -124,6 +131,10 @@ export default function CreateListing() {
       toast.error('Please enter the property address');
       return;
     }
+    if (!formData.ownerPhone || formData.ownerPhone.trim().length !== 10) {
+      toast.error('Please enter a valid 10-digit phone number');
+      return;
+    }
     if (formData.imageUrls.length < 1) {
       toast.error('You must upload at least one image');
       return;
@@ -143,6 +154,8 @@ export default function CreateListing() {
         body: JSON.stringify({
           ...formData,
           userRef: currentUser._id,
+          ownerName: currentUser.username,
+          ownerEmail: currentUser.email,
         }),
       });
       const data = await res.json();
@@ -152,7 +165,7 @@ export default function CreateListing() {
         toast.error(data.message || 'Failed to create listing');
       } else {
         toast.success('Listing created successfully!');
-        navigate('/profile');
+        navigate('/my-listings');
       }
     } catch (error) {
       setError(error.message);
@@ -165,8 +178,16 @@ export default function CreateListing() {
       <div className='max-w-5xl mx-auto px-4 sm:px-6 py-10'>
         {/* Header */}
         <div className='mb-8'>
-          <h1 className='text-2xl lg:text-3xl font-bold text-slate-800'>Create a Listing</h1>
-          <p className='text-gray-500 text-sm mt-1'>Fill in the details below to list your property</p>
+          <button
+            type='button'
+            onClick={() => navigate('/my-listings')}
+            className='inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-teal-600 transition-colors mb-4'
+          >
+            <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' /></svg>
+            Back to Listings
+          </button>
+          <h1 className='text-2xl lg:text-3xl font-bold text-slate-800 text-center'>Create a Listing</h1>
+          <p className='text-gray-500 text-sm mt-1 text-center'>Fill in the details below to list your property</p>
         </div>
 
         <form onSubmit={handleSubmit} className='grid lg:grid-cols-5 gap-6'>
@@ -195,10 +216,11 @@ export default function CreateListing() {
                   placeholder='Describe your property in detail...'
                   className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors min-h-[120px] resize-none'
                   id='description'
-                  
+                  maxLength='500'
                   onChange={handleChange}
                   value={formData.description}
                 />
+                <p className='text-xs text-gray-400 mt-1'>{(formData.description || '').length}/500 characters</p>
               </div>
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-1.5'>Address <span className='text-red-400'>*</span></label>
@@ -211,6 +233,22 @@ export default function CreateListing() {
                   onChange={handleChange}
                   value={formData.address}
                 />
+              </div>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-1.5'>Contact Phone Number <span className='text-red-400'>*</span></label>
+                <input
+                  type='text'
+                  inputMode='numeric'
+                  placeholder='e.g. 9876543210'
+                  className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm hover:border-gray-300 focus:outline-none focus:border-teal-400 transition-colors'
+                  id='ownerPhone'
+                  maxLength='10'
+                  onChange={handleChange}
+                  value={formData.ownerPhone}
+                />
+                <p className='text-xs text-gray-400 mt-1'>
+                  {formData.ownerPhone.length}/10 digits — Visible to users who want to contact you
+                </p>
               </div>
             </div>
 
@@ -256,12 +294,12 @@ export default function CreateListing() {
                   <input type='number' id='bathrooms'    className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-400' onChange={handleChange} value={formData.bathrooms} />
                 </div>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Price {formData.type === 'rent' ? '($/mo)' : '($)'} <span className='text-red-400'>*</span></label>
+                  <label className='block text-sm font-medium text-gray-700 mb-1.5'>Price {formData.type === 'rent' ? '(₹/mo)' : '(₹)'} <span className='text-red-400'>*</span></label>
                   <input type='number' id='regularPrice'    className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-400' onChange={handleChange} value={formData.regularPrice} />
                 </div>
                 {formData.offer && (
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1.5'>Discount {formData.type === 'rent' ? '($/mo)' : '($)'}</label>
+                    <label className='block text-sm font-medium text-gray-700 mb-1.5'>Discount {formData.type === 'rent' ? '(₹/mo)' : '(₹)'}</label>
                     <input type='number' id='discountPrice'    className='w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-400' onChange={handleChange} value={formData.discountPrice} />
                   </div>
                 )}

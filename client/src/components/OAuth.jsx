@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import {signInSuccess} from '../redux/user/userSlice'
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-export default function OAuth() {
+export default function OAuth({ redirect = '/' }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const handleGoogleClick = async()=>{
@@ -27,7 +27,7 @@ export default function OAuth() {
           const data = await res.json();
           dispatch(signInSuccess(data));
           toast.success('Login successful! Welcome to Kamankar Estate');
-        navigate('/');
+        navigate(redirect);
         }catch(error){
             toast.error('Google sign in failed. Please try again.');
         }

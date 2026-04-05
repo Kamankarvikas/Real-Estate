@@ -37,10 +37,10 @@ export default function ListingItem({ listing }) {
         <div className='p-4 flex flex-col flex-1'>
           {/* Price */}
           <p className='text-lg font-bold text-slate-900 mb-1'>
-            $
+            ₹
             {listing.offer
-              ? (listing.discountPrice || 0).toLocaleString('en-US')
-              : (listing.regularPrice || 0).toLocaleString('en-US')}
+              ? (listing.discountPrice || 0).toLocaleString('en-IN')
+              : (listing.regularPrice || 0).toLocaleString('en-IN')}
             {listing.type === 'rent' && (
               <span className='text-sm font-normal text-gray-400'>/mo</span>
             )}
