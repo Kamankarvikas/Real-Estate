@@ -146,9 +146,9 @@ export const Google = async (req, res, next) => {
       });
       await newUser.save();
 
-      // Send welcome email for Google users
+      // Send welcome email for Google users (non-blocking)
       try {
-        await getTransporter().sendMail({
+        getTransporter().sendMail({
           from: `"Kamankar Estate" <${process.env.EMAIL_USER}>`,
           to: req.body.email,
           subject: 'Welcome to Kamankar Estate!',

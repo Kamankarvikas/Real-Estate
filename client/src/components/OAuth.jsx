@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {GoogleAuthProvider, getAuth , signInWithPopup} from 'firebase/auth';
 import {app} from '../firebase';
 import { useDispatch } from 'react-redux';
@@ -8,8 +8,10 @@ import toast from 'react-hot-toast';
 export default function OAuth({ redirect = '/' }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const handleGoogleClick = async()=>{
         try{
+           setLoading(true);
            const provider = new GoogleAuthProvider();
            const auth =getAuth(app);
            const result = await signInWithPopup(auth, provider);
@@ -29,9 +31,23 @@ export default function OAuth({ redirect = '/' }) {
           toast.success('Login successful! Welcome to Kamankar Estate');
         navigate(redirect);
         }catch(error){
+            setLoading(false);
             toast.error('Google sign in failed. Please try again.');
         }
     }
+
+  if (loading) {
+    return (
+      <div className='fixed inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-50'>
+        <div className='text-center'>
+          <div className='w-12 h-12 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4'></div>
+          <p className='text-lg font-semibold text-slate-800'>Signing you in...</p>
+          <p className='text-sm text-gray-400 mt-1'>Please wait while we verify your account</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <button
       onClick={handleGoogleClick}
