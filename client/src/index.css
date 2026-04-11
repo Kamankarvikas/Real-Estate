@@ -63,21 +63,29 @@ body {
   animation: spin-reverse 1.2s linear infinite;
 }
 
-/* Swiper custom arrows */
+/* Fix Swiper blurry images caused by translate3d GPU compositing */
+.swiper-slide img {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Swiper custom arrows - hidden on mobile */
 .swiper-button-next,
 .swiper-button-prev {
   color: white !important;
   background: rgba(0, 0, 0, 0.35);
-  width: 36px !important;
-  height: 36px !important;
+  width: 44px !important;
+  height: 44px !important;
   border-radius: 50%;
-  display: flex !important;
+  display: none !important;
 }
 @media (min-width: 640px) {
   .swiper-button-next,
   .swiper-button-prev {
-    width: 44px !important;
-    height: 44px !important;
+    display: flex !important;
   }
 }
 .swiper-button-next::after,

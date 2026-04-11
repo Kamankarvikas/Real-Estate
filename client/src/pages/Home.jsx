@@ -133,42 +133,82 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ========== CAROUSEL (full width, unique images) ========== */}
+      {/* ========== FEATURED CAROUSEL ========== */}
       {uniqueCarouselListings.length > 0 && (
-        <Swiper
-          navigation
-          autoplay={{ delay: 3000, disableOnInteraction: false }}
-          loop={true}
-        >
-          {uniqueCarouselListings.map((listing) => (
-            <SwiperSlide key={listing._id}>
-              <Link to={`/listing/${listing._id}`}>
-                <div
-                  className='h-[300px] sm:h-[400px] lg:h-[500px]'
-                  style={{
-                    background: `url(${listing.imageUrls[0]}) center no-repeat`,
-                    backgroundSize: 'cover',
-                  }}
-                >
-                  {/* Overlay with listing info */}
-                  <div className='h-full flex items-end'>
-                    <div className='w-full bg-gradient-to-t from-black/70 to-transparent px-6 pb-6 pt-20'>
-                      <div className='max-w-6xl mx-auto'>
-                        <p className='text-white text-lg sm:text-xl font-bold'>{listing.name}</p>
-                        <p className='text-gray-300 text-sm mt-1'>
-                          ₹{listing.offer
-                            ? listing.discountPrice.toLocaleString('en-IN')
-                            : listing.regularPrice.toLocaleString('en-IN')}
-                          {listing.type === 'rent' && ' / month'}
-                        </p>
+        <div className='bg-white'>
+          <div className='max-w-6xl mx-auto px-4 sm:px-6 py-12'>
+            <div className='flex items-end justify-between mb-6'>
+              <div>
+                <p className='text-teal-600 text-xs font-semibold uppercase tracking-widest mb-1'>Featured</p>
+                <h2 className='text-2xl font-bold text-slate-800'>Top Properties</h2>
+              </div>
+            </div>
+            <div className='rounded-2xl overflow-hidden shadow-lg'>
+              <Swiper
+                navigation
+                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                loop={true}
+              >
+                {uniqueCarouselListings.map((listing) => (
+                  <SwiperSlide key={listing._id}>
+                    <Link to={`/listing/${listing._id}`}>
+                      <div className='relative h-[250px] sm:h-[350px] lg:h-[420px]'>
+                        <img
+                          src={listing.imageUrls[0]}
+                          alt={listing.name}
+                          className='w-full h-full object-cover'
+                        />
+                        {/* Type badge */}
+                        <div className='absolute top-4 left-4 z-10'>
+                          <span className={`text-xs font-semibold px-3 py-1.5 rounded-full text-white shadow-md ${listing.type === 'rent' ? 'bg-teal-600' : 'bg-emerald-600'}`}>
+                            {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
+                          </span>
+                        </div>
+                        {listing.offer && (
+                          <div className='absolute top-4 right-4 z-10'>
+                            <span className='text-xs font-semibold px-3 py-1.5 rounded-full bg-amber-500 text-white shadow-md'>
+                              Special Offer
+                            </span>
+                          </div>
+                        )}
+                        {/* Bottom overlay */}
+                        <div className='absolute inset-0 flex items-end'>
+                          <div className='w-full bg-gradient-to-t from-black/80 via-black/40 to-transparent px-6 pb-5 pt-24'>
+                            <p className='text-white text-lg sm:text-xl font-bold'>{listing.name}</p>
+                            <div className='flex items-center gap-4 mt-1.5'>
+                              <p className='text-teal-300 font-bold text-base sm:text-lg'>
+                                ₹{listing.offer
+                                  ? listing.discountPrice.toLocaleString('en-IN')
+                                  : listing.regularPrice.toLocaleString('en-IN')}
+                                {listing.type === 'rent' && <span className='text-sm font-normal text-gray-300'> / month</span>}
+                              </p>
+                              {listing.offer && (
+                                <p className='text-gray-400 text-sm line-through'>
+                                  ₹{listing.regularPrice.toLocaleString('en-IN')}
+                                </p>
+                              )}
+                            </div>
+                            <div className='flex items-center gap-3 mt-2 text-gray-300 text-xs'>
+                              <span>{listing.bedrooms} {listing.bedrooms > 1 ? 'Beds' : 'Bed'}</span>
+                              <span className='w-1 h-1 bg-gray-400 rounded-full'></span>
+                              <span>{listing.bathrooms} {listing.bathrooms > 1 ? 'Baths' : 'Bath'}</span>
+                              {listing.parking && (
+                                <>
+                                  <span className='w-1 h-1 bg-gray-400 rounded-full'></span>
+                                  <span>Parking</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+                    </Link>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ========== HOW IT WORKS ========== */}

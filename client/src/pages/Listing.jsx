@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
 import { useSelector } from 'react-redux';
-import { Navigation } from 'swiper/modules';
+import { Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css/bundle';
 import {
   FaBath,
@@ -12,18 +12,16 @@ import {
   FaChair,
   FaMapMarkerAlt,
   FaParking,
-  FaShare,
   FaTag,
   FaCheckCircle,
 } from 'react-icons/fa';
 import Contact from '../components/Contact';
 
 export default function Listing() {
-  SwiperCore.use([Navigation]);
+  SwiperCore.use([Navigation, Autoplay]);
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [contact, setContact] = useState(false);
   const params = useParams();
   const navigate = useNavigate();
@@ -76,43 +74,26 @@ export default function Listing() {
       {listing && !loading && !error && (
         <div>
           {/* Image Carousel */}
-          <div className='relative'>
-            <Swiper navigation>
-              {listing.imageUrls.map((url) => (
-                <SwiperSlide key={url}>
-                  <div
-                    className='h-[350px] sm:h-[450px] lg:h-[500px]'
-                    style={{
-                      background: `url(${url}) center no-repeat`,
-                      backgroundSize: 'cover',
-                    }}
-                  ></div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
+          <div className='max-w-6xl mx-auto px-4 sm:px-6 pt-8'>
+            <div className='relative rounded-2xl overflow-hidden shadow-lg'>
+              <Swiper navigation autoplay={{ delay: 3000, disableOnInteraction: false }} loop={true}>
+                {listing.imageUrls.map((url) => (
+                  <SwiperSlide key={url}>
+                    <div className='h-[250px] sm:h-[350px] lg:h-[420px]'>
+                      <img
+                        src={url}
+                        alt={listing.name}
+                        className='w-full h-full object-cover'
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
 
-            {/* Share button */}
-            <div className='absolute top-4 right-4 z-10'>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                }}
-                className='w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors'
-              >
-                <FaShare className='text-slate-600 text-sm' />
-              </button>
-              {copied && (
-                <div className='absolute top-14 right-0 bg-slate-800 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-lg whitespace-nowrap'>
-                  Link copied!
-                </div>
-              )}
-            </div>
-
-            {/* Image count badge */}
-            <div className='absolute bottom-4 right-4 z-10 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full'>
-              {listing.imageUrls.length} photos
+              {/* Image count badge */}
+              <div className='absolute bottom-4 right-4 z-10 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full'>
+                {listing.imageUrls.length} photos
+              </div>
             </div>
           </div>
 
