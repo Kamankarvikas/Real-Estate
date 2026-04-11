@@ -1,6 +1,20 @@
+import jwt from 'jsonwebtoken';
 import Listing from '../models/listing.model.js';
+import Favorite from '../models/favorite.model.js';
 import { errorHandler } from '../utils/error.js';
 import getTransporter from '../config/nodemailer.js';
+
+// Helper: optionally get userId from token (does not block if no token)
+const getOptionalUserId = (req) => {
+  const token = req.cookies.access_token ||
+    (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+  if (!token) return null;
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET).id;
+  } catch (e) {
+    return null;
+  }
+};
 
 
 export const createListing = async (req, res, next) => {
@@ -61,10 +75,20 @@ export const updateListing=async(req,res,next)=>{
 
 export const getListing=async(req,res,next)=>{
   try{
-    const listing=await Listing.findById(req.params.id);
+    const listing=await Listing.findById(req.params.id).lean();
     if(!listing){
       return next(errorHandler(404,'Listing not found!'));
     }
+
+    // Attach favorited flag if user is logged in
+    const userId = getOptionalUserId(req);
+    if (userId) {
+      const fav = await Favorite.findOne({ userId, listingId: listing._id });
+      listing.favorited = !!fav;
+    } else {
+      listing.favorited = false;
+    }
+
     res.status(200).json(listing);
   }catch(error)
   {
@@ -117,6 +141,24 @@ export const getListings = async (req, res, next) => {
       .limit(limit)
       .skip(startIndex)
       .lean();
+
+    // Attach favorited flag if user is logged in
+    const userId = getOptionalUserId(req);
+    if (userId && listings.length > 0) {
+      const listingIds = listings.map((l) => l._id);
+      const userFavorites = await Favorite.find({
+        userId,
+        listingId: { $in: listingIds },
+      }).lean();
+      const favSet = new Set(userFavorites.map((f) => f.listingId.toString()));
+      listings.forEach((listing) => {
+        listing.favorited = favSet.has(listing._id.toString());
+      });
+    } else {
+      listings.forEach((listing) => {
+        listing.favorited = false;
+      });
+    }
 
     return res.status(200).json(listings);
   } catch (error) {

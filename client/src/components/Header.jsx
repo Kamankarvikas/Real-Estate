@@ -1,5 +1,5 @@
 
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaHeart } from 'react-icons/fa';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -12,6 +12,7 @@ export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -20,9 +21,11 @@ export default function Header() {
 
   const handleSignOut = async () => {
     try {
+      setSigningOut(true);
       dispatch(signOutUserStart());
       const res = await fetch('/api/auth/signout');
       const data = await res.json();
+      setSigningOut(false);
       if (data.success === false) {
         dispatch(signOutUserFailure(data.message));
         toast.error('Failed to sign out');
@@ -34,12 +37,14 @@ export default function Header() {
       setMenuOpen(false);
       navigate('/');
     } catch (error) {
+      setSigningOut(false);
       dispatch(signOutUserFailure(error.message));
       toast.error('Failed to sign out');
     }
   };
 
   return (
+    <>
     <header className='bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0 z-50'>
       <div className='flex items-center justify-between max-w-6xl px-4 py-3 mx-auto gap-3'>
         {/* Logo */}
@@ -76,6 +81,15 @@ export default function Header() {
               className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors ${isActive('/my-listings') ? 'text-teal-700 bg-teal-50' : 'text-gray-600 hover:text-teal-600 hover:bg-gray-50'}`}
             >
               Listings
+            </Link>
+          )}
+          {currentUser && (
+            <Link
+              to='/favorites'
+              className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 ${isActive('/favorites') ? 'text-teal-700 bg-teal-50' : 'text-gray-600 hover:text-teal-600 hover:bg-gray-50'}`}
+            >
+              <FaHeart className='text-xs' />
+              Favorites
             </Link>
           )}
 
@@ -161,6 +175,16 @@ export default function Header() {
                 My Listings
               </Link>
             )}
+            {currentUser && (
+              <Link
+                to='/favorites'
+                onClick={() => setMenuOpen(false)}
+                className={`px-3 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${isActive('/favorites') ? 'text-teal-700 bg-teal-50' : 'text-gray-700 hover:bg-gray-50'}`}
+              >
+                <FaHeart className='text-xs text-red-400' />
+                My Favorites
+              </Link>
+            )}
             <Link
               to='/profile'
               onClick={() => setMenuOpen(false)}
@@ -198,6 +222,19 @@ export default function Header() {
           onCancel={() => setShowSignOutModal(false)}
         />
       )}
+
     </header>
+
+      {/* Signing Out Overlay - outside header for full page coverage */}
+      {signingOut && (
+        <div className='fixed inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center z-[9999]'>
+          <div className='text-center'>
+            <div className='w-12 h-12 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4'></div>
+            <p className='text-lg font-semibold text-slate-800'>Signing out...</p>
+            <p className='text-sm text-gray-400 mt-1'>Please wait</p>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

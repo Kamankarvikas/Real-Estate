@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { FaBed, FaBath, FaMapMarkerAlt, FaParking, FaChair, FaSearch, FaPlus, FaHome, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaBed, FaBath, FaMapMarkerAlt, FaParking, FaChair, FaSearch, FaPlus, FaHome, FaTimes, FaChevronLeft, FaChevronRight, FaHeart, FaEnvelope, FaUser } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../components/ConfirmModal';
 
@@ -18,6 +18,9 @@ export default function MyListings() {
   const [totalPages, setTotalPages] = useState(0);
   const [deleteId, setDeleteId] = useState(null);
   const [viewListing, setViewListing] = useState(null);
+  const [likedByUsers, setLikedByUsers] = useState([]);
+  const [likedByListing, setLikedByListing] = useState(null);
+  const [loadingLikes, setLoadingLikes] = useState(false);
   const pageSize = 10;
 
   const fetchListings = useCallback(async (page = 1, search = '', type = 'all') => {
@@ -83,6 +86,31 @@ export default function MyListings() {
       toast.error('Failed to delete listing');
     } finally {
       setDeleteId(null);
+    }
+  };
+
+  const handleViewLikes = async (listing) => {
+    try {
+      setLoadingLikes(true);
+      setLikedByListing(listing);
+      const res = await fetch(`/api/favorite/liked-by/${listing._id}`);
+      if (!res.ok) {
+        toast.error('Failed to load interested users');
+        setLikedByListing(null);
+        return;
+      }
+      const data = await res.json();
+      if (data.success === false) {
+        toast.error(data.message || 'Failed to load interested users');
+        setLikedByListing(null);
+        return;
+      }
+      setLikedByUsers(Array.isArray(data) ? data : []);
+    } catch (error) {
+      toast.error('Unable to load interested users');
+      setLikedByListing(null);
+    } finally {
+      setLoadingLikes(false);
     }
   };
 
@@ -271,6 +299,14 @@ export default function MyListings() {
                       {listing.parking && (
                         <span className='flex items-center gap-1'><FaParking className='text-gray-400' /> Parking</span>
                       )}
+                      <button
+                        onClick={() => handleViewLikes(listing)}
+                        className='flex items-center gap-1.5 ml-auto text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 px-2.5 py-1 rounded-full transition-colors'
+                      >
+                        <FaHeart className={`text-[10px] ${listing.likeCount > 0 ? 'text-red-400' : 'text-gray-300'}`} />
+                        <span className='text-[11px] font-semibold'>{listing.likeCount || 0} {(listing.likeCount || 0) === 1 ? 'like' : 'likes'}</span>
+                        <span className='text-[10px] text-teal-500'>View</span>
+                      </button>
                     </div>
 
                     {/* Actions */}
@@ -474,6 +510,89 @@ export default function MyListings() {
               )}
 
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Liked By Modal */}
+      {likedByListing && (
+        <div className='fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4' onClick={() => { setLikedByListing(null); setLikedByUsers([]); }}>
+          <div
+            className='bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden'
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className='p-5 border-b border-gray-100'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <h3 className='text-lg font-bold text-slate-800'>Interested Users</h3>
+                  <p className='text-xs text-gray-400 mt-0.5'>{likedByListing.name}</p>
+                </div>
+                <button
+                  onClick={() => { setLikedByListing(null); setLikedByUsers([]); }}
+                  className='w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors'
+                >
+                  <FaTimes className='text-gray-500 text-xs' />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className='overflow-y-auto max-h-[60vh]'>
+              {loadingLikes && (
+                <div className='flex items-center justify-center py-12'>
+                  <div className='text-center'>
+                    <div className='w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-3'></div>
+                    <p className='text-sm text-gray-400'>Loading...</p>
+                  </div>
+                </div>
+              )}
+
+              {!loadingLikes && likedByUsers.length === 0 && (
+                <div className='py-12 text-center px-6'>
+                  <FaHeart className='text-gray-200 text-3xl mx-auto mb-3' />
+                  <p className='text-sm text-gray-400'>No one has liked this listing yet</p>
+                </div>
+              )}
+
+              {!loadingLikes && likedByUsers.length > 0 && (
+                <div className='divide-y divide-gray-100'>
+                  {likedByUsers.map((user) => (
+                    <div key={user._id} className='px-5 py-4 flex items-center gap-3'>
+                      <img
+                        src={user.avatar}
+                        alt={user.username}
+                        className='w-10 h-10 rounded-full object-cover border border-gray-200 flex-shrink-0'
+                      />
+                      <div className='flex-1 min-w-0'>
+                        <div className='flex items-center gap-1.5'>
+                          <FaUser className='text-gray-400 text-[10px]' />
+                          <p className='text-sm font-semibold text-slate-800 truncate'>{user.username}</p>
+                        </div>
+                        <div className='flex items-center gap-1.5 mt-0.5'>
+                          <FaEnvelope className='text-gray-400 text-[10px]' />
+                          <a href={`mailto:${user.email}`} className='text-xs text-teal-600 hover:text-teal-700 truncate'>
+                            {user.email}
+                          </a>
+                        </div>
+                        <p className='text-[10px] text-gray-400 mt-1'>
+                          Liked on {new Date(user.likedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            {!loadingLikes && likedByUsers.length > 0 && (
+              <div className='p-4 border-t border-gray-100 bg-gray-50'>
+                <p className='text-xs text-gray-400 text-center'>
+                  {likedByUsers.length} {likedByUsers.length === 1 ? 'person is' : 'people are'} interested in this property
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}

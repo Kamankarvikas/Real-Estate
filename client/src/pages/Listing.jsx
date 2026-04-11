@@ -14,7 +14,10 @@ import {
   FaParking,
   FaTag,
   FaCheckCircle,
+  FaHeart,
+  FaRegHeart,
 } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 import Contact from '../components/Contact';
 
 export default function Listing() {
@@ -23,6 +26,8 @@ export default function Listing() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [contact, setContact] = useState(false);
+  const [favorited, setFavorited] = useState(false);
+  const [toggling, setToggling] = useState(false);
   const params = useParams();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
@@ -30,6 +35,37 @@ export default function Listing() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [params.listingId]);
+
+  // Set favorited from listing data (comes from API response)
+  useEffect(() => {
+    if (listing && listing.favorited !== undefined) {
+      setFavorited(listing.favorited);
+    }
+  }, [listing]);
+
+  const handleFavoriteToggle = async () => {
+    if (!currentUser) {
+      toast('Please log in to keep your favorites', { icon: '⚠️' });
+      navigate('/sign-in');
+      return;
+    }
+    if (toggling) return;
+    setToggling(true);
+    try {
+      const res = await fetch(`/api/favorite/toggle/${params.listingId}`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success === false) {
+        toast.error(data.message || 'Something went wrong');
+        return;
+      }
+      setFavorited(data.favorited);
+      toast.success(data.favorited ? 'Saved to favorites!' : 'Removed from favorites');
+    } catch (error) {
+      toast.error('Unable to update favorite. Please try again.');
+    } finally {
+      setToggling(false);
+    }
+  };
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -103,18 +139,31 @@ export default function Listing() {
 
               {/* Left Column - Property Details */}
               <div className='flex-1'>
-                {/* Badges */}
-                <div className='flex flex-wrap gap-2 mb-4'>
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${listing.type === 'rent' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-700'}`}>
-                    <FaTag className='text-[10px]' />
-                    {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
-                  </span>
-                  {listing.offer && (
-                    <span className='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700'>
-                      <FaCheckCircle className='text-[10px]' />
-                      Special Offer
+                {/* Badges + Favorite */}
+                <div className='flex items-center justify-between mb-4'>
+                  <div className='flex flex-wrap gap-2'>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${listing.type === 'rent' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-700'}`}>
+                      <FaTag className='text-[10px]' />
+                      {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
                     </span>
-                  )}
+                    {listing.offer && (
+                      <span className='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700'>
+                        <FaCheckCircle className='text-[10px]' />
+                        Special Offer
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleFavoriteToggle}
+                    disabled={toggling}
+                    className='w-9 h-9 rounded-full border border-gray-200 hover:bg-red-50 flex items-center justify-center transition-colors disabled:opacity-50'
+                  >
+                    {favorited ? (
+                      <FaHeart className='text-red-500 text-base' />
+                    ) : (
+                      <FaRegHeart className='text-gray-400 text-base' />
+                    )}
+                  </button>
                 </div>
 
                 {/* Title & Price */}

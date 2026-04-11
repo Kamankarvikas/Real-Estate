@@ -6,6 +6,7 @@ import userRouter from '../server/routes/user.route.js';
 import authRouter from '../server/routes/auth.route.js';
 import listingRouter from '../server/routes/listing.route.js';
 import uploadRouter from '../server/routes/upload.route.js';
+import favoriteRouter from '../server/routes/favorite.route.js';
 import cookieParser from 'cookie-parser';
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use('/api/user/',userRouter);
 app.use('/api/auth/',authRouter);
 app.use('/api/listing', listingRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/favorite', favoriteRouter);
 
 app.use((err,req,res,next)=>{
     const statusCode=err.statusCode||500;

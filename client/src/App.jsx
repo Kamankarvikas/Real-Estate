@@ -11,6 +11,7 @@ import PublicRoute from './components/PublicRoute';
 import CreateListing from './pages/CreateListing';
 import UpdateListing from './pages/UpdateListing';
 import MyListings from './pages/MyListings';
+import Favorites from './pages/Favorites';
 import Listing from './pages/Listing';
 import Search from './pages/Search';
 import ActivateAccount from './pages/ActivateAccount';
@@ -59,6 +60,7 @@ function Layout() {
           <Route path='/profile' element={<Profile />} />
           <Route path='/create-listing' element={<CreateListing />} />
           <Route path='/my-listings' element={<MyListings />} />
+          <Route path='/favorites' element={<Favorites />} />
           <Route
             path='/update-listing/:listingId'
             element={<UpdateListing />}

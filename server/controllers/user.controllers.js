@@ -3,6 +3,7 @@ import bcryptjs from 'bcryptjs';
 import User from '../models/user.model.js';
 import { errorHandler } from '../utils/error.js';
 import Listing from '../models/listing.model.js';
+import Favorite from '../models/favorite.model.js';
 
 export const test = (req, res) => {
   res.json({
@@ -78,6 +79,22 @@ export const getUserListings = async (req, res, next) => {
       .skip(skip)
       .limit(pageSize)
       .lean();
+
+    // Attach likeCount to each listing
+    if (listings.length > 0) {
+      const listingIds = listings.map((l) => l._id);
+      const counts = await Favorite.aggregate([
+        { $match: { listingId: { $in: listingIds } } },
+        { $group: { _id: '$listingId', count: { $sum: 1 } } },
+      ]);
+      const countMap = {};
+      counts.forEach((item) => {
+        countMap[item._id.toString()] = item.count;
+      });
+      listings.forEach((listing) => {
+        listing.likeCount = countMap[listing._id.toString()] || 0;
+      });
+    }
 
     res.status(200).json({
       listings,

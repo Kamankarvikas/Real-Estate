@@ -30,6 +30,7 @@ export default function Profile() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -130,9 +131,11 @@ export default function Profile() {
 
   const handleSignOut = async () => {
     try {
+      setSigningOut(true);
       dispatch(signOutUserStart());
       const res = await fetch('/api/auth/signout');
       const data = await res.json();
+      setSigningOut(false);
       if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
         toast.error('Failed to sign out');
@@ -142,6 +145,7 @@ export default function Profile() {
       dispatch(deleteUserSuccess(data));
       toast.success('Signed out successfully!');
     } catch (error) {
+      setSigningOut(false);
       dispatch(deleteUserFailure(error.message));
       toast.error('Failed to sign out');
     }
@@ -386,6 +390,16 @@ export default function Profile() {
           }}
           onCancel={() => setShowDeleteModal(false)}
         />
+      )}
+
+      {signingOut && (
+        <div className='fixed inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-[60]'>
+          <div className='text-center'>
+            <div className='w-12 h-12 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4'></div>
+            <p className='text-lg font-semibold text-slate-800'>Signing out...</p>
+            <p className='text-sm text-gray-400 mt-1'>Please wait</p>
+          </div>
+        </div>
       )}
     </div>
   );

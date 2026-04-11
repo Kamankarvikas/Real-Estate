@@ -63,9 +63,9 @@ export default function Home() {
           rentRes.json(),
           saleRes.json(),
         ]);
-        setOfferListings(offerData);
-        setRentListings(rentData);
-        setSaleListings(saleData);
+        setOfferListings(Array.isArray(offerData) ? offerData : []);
+        setRentListings(Array.isArray(rentData) ? rentData : []);
+        setSaleListings(Array.isArray(saleData) ? saleData : []);
       } catch (error) {
         console.log(error);
       } finally {
@@ -300,7 +300,7 @@ export default function Home() {
               </div>
               <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
                 {offerListings.map((listing) => (
-                  <ListingItem listing={listing} key={listing._id} />
+                  <ListingItem listing={listing} key={listing._id} isFavorited={listing.favorited} />
                 ))}
               </div>
             </div>
@@ -319,7 +319,7 @@ export default function Home() {
               </div>
               <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
                 {rentListings.map((listing) => (
-                  <ListingItem listing={listing} key={listing._id} />
+                  <ListingItem listing={listing} key={listing._id} isFavorited={listing.favorited} />
                 ))}
               </div>
             </div>
@@ -338,7 +338,7 @@ export default function Home() {
               </div>
               <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
                 {saleListings.map((listing) => (
-                  <ListingItem listing={listing} key={listing._id} />
+                  <ListingItem listing={listing} key={listing._id} isFavorited={listing.favorited} />
                 ))}
               </div>
             </div>
