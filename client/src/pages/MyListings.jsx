@@ -90,227 +90,218 @@ export default function MyListings() {
   const endItem = Math.min(currentPage * pageSize, total);
 
   return (
-    <div className='min-h-screen bg-gradient-to-b from-teal-900 via-gray-50 to-gray-50'>
-      {/* Hero Header */}
-      <div className='bg-teal-900 pb-24 pt-8'>
-        <div className='max-w-6xl mx-auto px-4 sm:px-6'>
-          <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
-            <div>
-              <h1 className='text-2xl sm:text-3xl font-bold text-white'>My Listings</h1>
-              <p className='text-teal-300 text-sm mt-0.5'>{total} {total === 1 ? 'property' : 'properties'} listed</p>
-            </div>
-            <Link
-              to='/create-listing'
-              className='inline-flex items-center justify-center gap-2 bg-white text-teal-700 font-semibold px-5 py-2.5 rounded-xl hover:bg-teal-50 transition-colors text-sm shadow-lg'
-            >
-              <FaPlus className='text-xs' />
-              Create Listing
-            </Link>
+    <div className='min-h-screen bg-gray-50'>
+      {/* Header */}
+      <div className='max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-6'>
+        <div className='flex items-center justify-between'>
+          <div>
+            <h1 className='text-2xl sm:text-3xl font-bold text-slate-800'>My Listings</h1>
+            <p className='text-gray-400 text-sm mt-0.5'>{total} {total === 1 ? 'property' : 'properties'} listed</p>
           </div>
+          <Link
+            to='/create-listing'
+            className='inline-flex items-center justify-center gap-1.5 bg-teal-600 text-white font-semibold px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:bg-teal-700 transition-colors text-xs sm:text-sm'
+          >
+            <FaPlus className='text-[10px] sm:text-xs' />
+            Create Listing
+          </Link>
         </div>
       </div>
 
-      {/* Content Card (overlapping hero) */}
-      <div className='max-w-6xl mx-auto px-4 sm:px-6 -mt-16'>
-        <div className='bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden'>
+      {/* Search & Filters */}
+      <div className='max-w-6xl mx-auto px-4 sm:px-6 pb-6'>
+        {/* Search */}
+        <form onSubmit={handleSearch} className='flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 focus-within:border-teal-400 shadow-sm transition-colors mb-3'>
+          <FaSearch className='text-gray-400 text-sm flex-shrink-0' />
+          <input
+            type='text'
+            placeholder='Search by name or address...'
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className='w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 focus:outline-none'
+          />
+          {searchInput && (
+            <button type='button' onClick={handleClearSearch} className='text-gray-400 hover:text-gray-600 flex-shrink-0'>
+              <FaTimes className='text-xs' />
+            </button>
+          )}
+          <button type='submit' className='text-xs font-semibold text-teal-600 hover:text-teal-700 flex-shrink-0 pl-2 border-l border-gray-200'>
+            Search
+          </button>
+        </form>
 
-          {/* Search & Filters Bar */}
-          <div className='p-4 sm:p-6 border-b border-gray-100'>
-            <div className='flex flex-col sm:flex-row gap-3'>
-              {/* Search */}
-              <form onSubmit={handleSearch} className='flex-1 flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 focus-within:border-teal-400 transition-colors'>
-                <FaSearch className='text-gray-400 text-sm flex-shrink-0' />
-                <input
-                  type='text'
-                  placeholder='Search by name or address...'
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className='w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 focus:outline-none'
-                />
-                {searchInput && (
-                  <button type='button' onClick={handleClearSearch} className='text-gray-400 hover:text-gray-600 flex-shrink-0'>
-                    <FaTimes className='text-xs' />
-                  </button>
-                )}
-                <button type='submit' className='text-xs font-semibold text-teal-600 hover:text-teal-700 flex-shrink-0 pl-2 border-l border-gray-200'>
-                  Search
-                </button>
-              </form>
+        {/* Filters + Create (mobile) */}
+        <div className='flex items-center gap-2'>
+          {['all', 'sale', 'rent'].map((type) => (
+            <button
+              key={type}
+              onClick={() => { setTypeFilter(type); setCurrentPage(1); }}
+              className={`px-3 sm:px-4 py-2 sm:py-2.5 text-sm font-medium rounded-xl transition-colors ${
+                typeFilter === type
+                  ? 'bg-teal-600 text-white shadow-sm'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 shadow-sm'
+              }`}
+            >
+              {type === 'all' ? 'All' : type === 'sale' ? 'For Sale' : 'For Rent'}
+            </button>
+          ))}
+        </div>
 
-              {/* Type Filter */}
-              <div className='flex items-center gap-2'>
-                {['all', 'sale', 'rent'].map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => { setTypeFilter(type); setCurrentPage(1); }}
-                    className={`px-4 py-2.5 text-sm font-medium rounded-xl transition-colors ${
-                      typeFilter === type
-                        ? 'bg-teal-600 text-white'
-                        : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100'
-                    }`}
-                  >
-                    {type === 'all' ? 'All' : type === 'sale' ? 'For Sale' : 'For Rent'}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Active filters */}
-            {(searchTerm || typeFilter !== 'all') && (
-              <div className='flex items-center gap-2 mt-3 flex-wrap'>
-                <span className='text-xs text-gray-400'>Filters:</span>
-                {searchTerm && (
-                  <span className='inline-flex items-center gap-1.5 text-xs bg-teal-50 text-teal-700 px-3 py-1 rounded-full'>
-                    "{searchTerm}"
-                    <button onClick={handleClearSearch}><FaTimes className='text-[10px]' /></button>
-                  </span>
-                )}
-                {typeFilter !== 'all' && (
-                  <span className='inline-flex items-center gap-1.5 text-xs bg-teal-50 text-teal-700 px-3 py-1 rounded-full'>
-                    {typeFilter === 'sale' ? 'For Sale' : 'For Rent'}
-                    <button onClick={() => setTypeFilter('all')}><FaTimes className='text-[10px]' /></button>
-                  </span>
-                )}
-              </div>
+        {/* Active filters */}
+        {(searchTerm || typeFilter !== 'all') && (
+          <div className='flex items-center gap-2 mt-3 flex-wrap'>
+            <span className='text-xs text-gray-400'>Filters:</span>
+            {searchTerm && (
+              <span className='inline-flex items-center gap-1.5 text-xs bg-teal-50 text-teal-700 px-3 py-1 rounded-full'>
+                "{searchTerm}"
+                <button onClick={handleClearSearch}><FaTimes className='text-[10px]' /></button>
+              </span>
+            )}
+            {typeFilter !== 'all' && (
+              <span className='inline-flex items-center gap-1.5 text-xs bg-teal-50 text-teal-700 px-3 py-1 rounded-full'>
+                {typeFilter === 'sale' ? 'For Sale' : 'For Rent'}
+                <button onClick={() => setTypeFilter('all')}><FaTimes className='text-[10px]' /></button>
+              </span>
             )}
           </div>
+        )}
+      </div>
 
-          {/* Loading */}
-          {loading && (
-            <div className='flex items-center justify-center py-20'>
-              <div className='text-center'>
-                <div className='w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4'></div>
-                <p className='text-gray-500 text-sm'>Loading your listings...</p>
-              </div>
+      {/* Content */}
+      <div className='max-w-6xl mx-auto px-4 sm:px-6 pb-10'>
+        {/* Loading */}
+        {loading && (
+          <div className='flex items-center justify-center py-20'>
+            <div className='text-center'>
+              <div className='w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4'></div>
+              <p className='text-gray-500 text-sm'>Loading your listings...</p>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Empty State */}
-          {!loading && listings.length === 0 && (
-            <div className='py-16 px-6 text-center'>
-              <div className='w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-5'>
-                <FaHome className='text-teal-400 text-3xl' />
-              </div>
-              {searchTerm || typeFilter !== 'all' ? (
-                <>
-                  <h3 className='text-lg font-bold text-slate-800 mb-2'>No Results Found</h3>
-                  <p className='text-sm text-gray-400 mb-6 max-w-sm mx-auto'>
-                    No listings match your filters. Try a different search or filter.
-                  </p>
-                  <button
-                    onClick={() => { handleClearSearch(); setTypeFilter('all'); }}
-                    className='text-sm font-semibold text-teal-600 hover:text-teal-700 transition-colors'
-                  >
-                    Clear All Filters
-                  </button>
-                </>
-              ) : (
-                <>
-                  <h3 className='text-lg font-bold text-slate-800 mb-2'>No Listings Yet</h3>
-                  <p className='text-sm text-gray-400 mb-6 max-w-sm mx-auto'>
-                    Start listing your property to reach potential buyers and renters.
-                  </p>
-                  <Link
-                    to='/create-listing'
-                    className='inline-flex items-center gap-2 bg-teal-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-teal-700 transition-colors text-sm'
-                  >
-                    <FaPlus className='text-xs' />
-                    Create Your First Listing
-                  </Link>
-                </>
-              )}
+        {/* Empty State */}
+        {!loading && listings.length === 0 && (
+          <div className='py-20 text-center'>
+            <div className='w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-5'>
+              <FaHome className='text-teal-400 text-3xl' />
             </div>
-          )}
+            {searchTerm || typeFilter !== 'all' ? (
+              <>
+                <h3 className='text-lg font-bold text-slate-800 mb-2'>No Results Found</h3>
+                <p className='text-sm text-gray-400 mb-6 max-w-sm mx-auto'>
+                  No listings match your filters. Try a different search or filter.
+                </p>
+                <button
+                  onClick={() => { handleClearSearch(); setTypeFilter('all'); }}
+                  className='text-sm font-semibold text-teal-600 hover:text-teal-700 transition-colors'
+                >
+                  Clear All Filters
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className='text-lg font-bold text-slate-800 mb-2'>No Listings Yet</h3>
+                <p className='text-sm text-gray-400 mb-6 max-w-sm mx-auto'>
+                  Start listing your property to reach potential buyers and renters.
+                </p>
+                <Link
+                  to='/create-listing'
+                  className='inline-flex items-center gap-2 bg-teal-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-teal-700 transition-colors text-sm'
+                >
+                  <FaPlus className='text-xs' />
+                  Create Your First Listing
+                </Link>
+              </>
+            )}
+          </div>
+        )}
 
-          {/* Listing Cards */}
-          {!loading && listings.length > 0 && (
-            <div className='p-4 sm:p-6'>
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
-                {listings.map((listing) => (
-                  <div
-                    key={listing._id}
-                    className='bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg transition-all group'
-                  >
-                    {/* Image */}
-                    <div className='relative overflow-hidden'>
-                      <div
-                        className='h-48 bg-gray-200 bg-center bg-cover group-hover:scale-105 transition-transform duration-300'
-                        style={{ backgroundImage: `url(${listing.imageUrls?.[0]})` }}
-                      ></div>
-                      <span className={`absolute top-3 left-3 text-xs font-semibold px-3 py-1 rounded-full text-white shadow-sm ${listing.type === 'rent' ? 'bg-teal-600' : 'bg-emerald-600'}`}>
-                        {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
+        {/* Listing Cards */}
+        {!loading && listings.length > 0 && (
+          <>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
+              {listings.map((listing) => (
+                <div
+                  key={listing._id}
+                  className='bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg transition-all group'
+                >
+                  {/* Image */}
+                  <div className='relative overflow-hidden'>
+                    <div
+                      className='h-48 bg-gray-200 bg-center bg-cover group-hover:scale-105 transition-transform duration-300'
+                      style={{ backgroundImage: `url(${listing.imageUrls?.[0]})` }}
+                    ></div>
+                    <span className={`absolute top-3 left-3 text-xs font-semibold px-3 py-1 rounded-full text-white shadow-sm ${listing.type === 'rent' ? 'bg-teal-600' : 'bg-emerald-600'}`}>
+                      {listing.type === 'rent' ? 'For Rent' : 'For Sale'}
+                    </span>
+                    {listing.offer && (
+                      <span className='absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded-full text-white shadow-sm bg-amber-500'>
+                        Offer
                       </span>
-                      {listing.offer && (
-                        <span className='absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded-full text-white shadow-sm bg-amber-500'>
-                          Offer
-                        </span>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className='p-4'>
+                    <p className='text-lg font-bold text-slate-900 mb-1'>
+                      ₹{listing.offer
+                        ? (listing.discountPrice || 0).toLocaleString('en-IN')
+                        : (listing.regularPrice || 0).toLocaleString('en-IN')}
+                      {listing.type === 'rent' && (
+                        <span className='text-sm font-normal text-gray-400'>/mo</span>
+                      )}
+                    </p>
+
+                    <h3 className='font-semibold text-sm text-slate-800 truncate mb-2'>{listing.name}</h3>
+
+                    <div className='flex items-start gap-1.5 mb-3'>
+                      <FaMapMarkerAlt className='text-teal-600 text-xs mt-0.5 flex-shrink-0' />
+                      <p className='text-xs text-gray-500 truncate'>{listing.address}</p>
+                    </div>
+
+                    <div className='flex items-center gap-3 text-xs text-gray-500 mb-4 pb-4 border-b border-gray-100'>
+                      <span className='flex items-center gap-1'>
+                        <FaBed className='text-gray-400' />
+                        {listing.bedrooms || 0} {(listing.bedrooms || 0) > 1 ? 'Beds' : 'Bed'}
+                      </span>
+                      <span className='flex items-center gap-1'>
+                        <FaBath className='text-gray-400' />
+                        {listing.bathrooms || 0} {(listing.bathrooms || 0) > 1 ? 'Baths' : 'Bath'}
+                      </span>
+                      {listing.parking && (
+                        <span className='flex items-center gap-1'><FaParking className='text-gray-400' /> Parking</span>
                       )}
                     </div>
 
-                    {/* Content */}
-                    <div className='p-4'>
-                      <p className='text-lg font-bold text-slate-900 mb-1'>
-                        ₹{listing.offer
-                          ? (listing.discountPrice || 0).toLocaleString('en-IN')
-                          : (listing.regularPrice || 0).toLocaleString('en-IN')}
-                        {listing.type === 'rent' && (
-                          <span className='text-sm font-normal text-gray-400'>/mo</span>
-                        )}
-                      </p>
-
-                      <h3 className='font-semibold text-sm text-slate-800 truncate mb-2'>{listing.name}</h3>
-
-                      <div className='flex items-start gap-1.5 mb-3'>
-                        <FaMapMarkerAlt className='text-teal-600 text-xs mt-0.5 flex-shrink-0' />
-                        <p className='text-xs text-gray-500 truncate'>{listing.address}</p>
-                      </div>
-
-                      <div className='flex items-center gap-3 text-xs text-gray-500 mb-4 pb-4 border-b border-gray-100'>
-                        <span className='flex items-center gap-1'>
-                          <FaBed className='text-gray-400' />
-                          {listing.bedrooms || 0} {(listing.bedrooms || 0) > 1 ? 'Beds' : 'Bed'}
-                        </span>
-                        <span className='flex items-center gap-1'>
-                          <FaBath className='text-gray-400' />
-                          {listing.bathrooms || 0} {(listing.bathrooms || 0) > 1 ? 'Baths' : 'Bath'}
-                        </span>
-                        {listing.parking && (
-                          <span className='flex items-center gap-1'><FaParking className='text-gray-400' /> Parking</span>
-                        )}
-                      </div>
-
-                      {/* Actions */}
-                      <div className='flex items-center gap-2'>
-                        <Link
-                          to={`/update-listing/${listing._id}`}
-                          className='flex-1 py-2 text-center text-xs font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors'
-                        >
-                          Edit
-                        </Link>
-                        <button
-                          onClick={() => setDeleteId(listing._id)}
-                          className='flex-1 py-2 text-center text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors'
-                        >
-                          Delete
-                        </button>
-                        <button
-                          onClick={() => setViewListing(listing)}
-                          className='flex-1 py-2 text-center text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors'
-                        >
-                          View
-                        </button>
-                      </div>
+                    {/* Actions */}
+                    <div className='flex items-center gap-2'>
+                      <Link
+                        to={`/update-listing/${listing._id}`}
+                        className='flex-1 py-2 text-center text-xs font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors'
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => setDeleteId(listing._id)}
+                        className='flex-1 py-2 text-center text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors'
+                      >
+                        Delete
+                      </button>
+                      <button
+                        onClick={() => setViewListing(listing)}
+                        className='flex-1 py-2 text-center text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors'
+                      >
+                        View
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          )}
 
-          {/* Pagination */}
-          {!loading && totalPages > 0 && (
-            <div className='px-4 sm:px-6 py-5 border-t border-gray-100 bg-gray-50/50'>
-              <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
+            {/* Pagination */}
+            {totalPages >= 1 && (
+              <div className='flex flex-col sm:flex-row items-center justify-between gap-4 mt-8'>
                 <p className='text-sm text-gray-500'>
                   Showing <span className='font-semibold text-slate-700'>{startItem}-{endItem}</span> of <span className='font-semibold text-slate-700'>{total}</span> listings
                 </p>
@@ -365,9 +356,9 @@ export default function MyListings() {
                   </button>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* View Listing Modal */}

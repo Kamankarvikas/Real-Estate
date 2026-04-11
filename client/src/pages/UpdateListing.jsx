@@ -27,17 +27,25 @@ export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fetchingData, setFetchingData] = useState(true);
 
   useEffect(() => {
     const fetchListing = async () => {
-      const listingId = params.listingId;
-      const res = await fetch(`/api/listing/get/${listingId}`);
-      const data = await res.json();
-      if (data.success === false) {
-        console.log(data.message);
-        return;
+      try {
+        setFetchingData(true);
+        const listingId = params.listingId;
+        const res = await fetch(`/api/listing/get/${listingId}`);
+        const data = await res.json();
+        if (data.success === false) {
+          toast.error(data.message || 'Failed to load listing');
+          return;
+        }
+        setFormData(data);
+      } catch (err) {
+        toast.error('Failed to load listing data');
+      } finally {
+        setFetchingData(false);
       }
-      setFormData(data);
     };
 
     fetchListing();
@@ -189,6 +197,14 @@ export default function CreateListing() {
           <p className='text-gray-500 text-sm mt-1 text-center'>Modify the details of your property listing</p>
         </div>
 
+        {fetchingData ? (
+          <div className='flex items-center justify-center py-32'>
+            <div className='text-center'>
+              <div className='w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4'></div>
+              <p className='text-gray-500 text-sm'>Loading listing data...</p>
+            </div>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit} className='grid lg:grid-cols-5 gap-6'>
           {/* Left - Property Details */}
           <div className='lg:col-span-3 space-y-6'>
@@ -380,6 +396,7 @@ export default function CreateListing() {
             )}
           </div>
         </form>
+        )}
       </div>
     </div>
   );
