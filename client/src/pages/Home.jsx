@@ -5,7 +5,7 @@ import { Navigation, Autoplay } from 'swiper/modules';
 import SwiperCore from 'swiper';
 import 'swiper/css/bundle';
 import ListingItem from '../components/ListingItem';
-import Loader from '../components/Loader';
+import { CardGridSkeleton, CarouselSkeleton } from '../components/Skeleton';
 import { FaSearch, FaRegCalendarCheck, FaKey, FaHome } from 'react-icons/fa';
 
 // ===== Count-up hook =====
@@ -54,18 +54,18 @@ export default function Home() {
     const fetchAllListings = async () => {
       try {
         const [offerRes, rentRes, saleRes] = await Promise.all([
-          fetch('/api/listing/get?offer=true&limit=4'),
-          fetch('/api/listing/get?type=rent&limit=4'),
-          fetch('/api/listing/get?type=sale&limit=4'),
+          fetch('/api/listing/get?offer=true&pageSize=4'),
+          fetch('/api/listing/get?type=rent&pageSize=4'),
+          fetch('/api/listing/get?type=sale&pageSize=4'),
         ]);
         const [offerData, rentData, saleData] = await Promise.all([
           offerRes.json(),
           rentRes.json(),
           saleRes.json(),
         ]);
-        setOfferListings(Array.isArray(offerData) ? offerData : []);
-        setRentListings(Array.isArray(rentData) ? rentData : []);
-        setSaleListings(Array.isArray(saleData) ? saleData : []);
+        setOfferListings(Array.isArray(offerData?.listings) ? offerData.listings : []);
+        setRentListings(Array.isArray(rentData?.listings) ? rentData.listings : []);
+        setSaleListings(Array.isArray(saleData?.listings) ? saleData.listings : []);
       } catch (error) {
         console.log(error);
       } finally {
@@ -85,10 +85,6 @@ export default function Home() {
   });
 
   const hasListings = offerListings.length > 0 || rentListings.length > 0 || saleListings.length > 0;
-
-  if (!loadingDone) {
-    return <Loader />;
-  }
 
   return (
     <div>
@@ -134,7 +130,18 @@ export default function Home() {
       </div>
 
       {/* ========== FEATURED CAROUSEL ========== */}
-      {uniqueCarouselListings.length > 0 && (
+      {!loadingDone && (
+        <div className='bg-white'>
+          <div className='max-w-6xl mx-auto px-4 sm:px-6 py-12'>
+            <div className='mb-6'>
+              <div className='h-3 w-20 bg-gray-200 rounded animate-pulse mb-2' />
+              <div className='h-7 w-44 bg-gray-200 rounded animate-pulse' />
+            </div>
+            <CarouselSkeleton />
+          </div>
+        </div>
+      )}
+      {loadingDone && uniqueCarouselListings.length > 0 && (
         <div className='bg-white'>
           <div className='max-w-6xl mx-auto px-4 sm:px-6 py-12'>
             <div className='flex items-end justify-between mb-6'>
@@ -260,6 +267,33 @@ export default function Home() {
       <div className='bg-gray-50'>
         <div className='max-w-6xl mx-auto px-6 py-20'>
 
+          {/* Loading Skeletons */}
+          {!loadingDone && (
+            <>
+              <div className='mb-16'>
+                <div className='mb-6'>
+                  <div className='h-3 w-20 bg-gray-200 rounded animate-pulse mb-2' />
+                  <div className='h-7 w-48 bg-gray-200 rounded animate-pulse' />
+                </div>
+                <CardGridSkeleton count={4} cols={4} />
+              </div>
+              <div className='mb-16'>
+                <div className='mb-6'>
+                  <div className='h-3 w-16 bg-gray-200 rounded animate-pulse mb-2' />
+                  <div className='h-7 w-40 bg-gray-200 rounded animate-pulse' />
+                </div>
+                <CardGridSkeleton count={4} cols={4} />
+              </div>
+              <div>
+                <div className='mb-6'>
+                  <div className='h-3 w-16 bg-gray-200 rounded animate-pulse mb-2' />
+                  <div className='h-7 w-40 bg-gray-200 rounded animate-pulse' />
+                </div>
+                <CardGridSkeleton count={4} cols={4} />
+              </div>
+            </>
+          )}
+
           {/* Empty state when no listings load */}
           {loadingDone && !hasListings && (
             <div className='text-center py-16'>
@@ -287,7 +321,7 @@ export default function Home() {
             </div>
           )}
 
-          {offerListings && offerListings.length > 0 && (
+          {loadingDone && offerListings && offerListings.length > 0 && (
             <div className='mb-16'>
               <div className='flex items-end justify-between mb-6'>
                 <div>
@@ -306,7 +340,7 @@ export default function Home() {
             </div>
           )}
 
-          {rentListings && rentListings.length > 0 && (
+          {loadingDone && rentListings && rentListings.length > 0 && (
             <div className='mb-16'>
               <div className='flex items-end justify-between mb-6'>
                 <div>
@@ -325,7 +359,7 @@ export default function Home() {
             </div>
           )}
 
-          {saleListings && saleListings.length > 0 && (
+          {loadingDone && saleListings && saleListings.length > 0 && (
             <div>
               <div className='flex items-end justify-between mb-6'>
                 <div>

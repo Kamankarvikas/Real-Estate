@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { FaBed, FaBath, FaMapMarkerAlt, FaParking, FaChair, FaSearch, FaPlus, FaHome, FaTimes, FaChevronLeft, FaChevronRight, FaHeart, FaEnvelope, FaUser } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../components/ConfirmModal';
+import { MyListingGridSkeleton, UserListSkeleton } from '../components/Skeleton';
 
 export default function MyListings() {
   const { currentUser } = useSelector((state) => state.user);
@@ -198,14 +199,7 @@ export default function MyListings() {
       {/* Content */}
       <div className='max-w-6xl mx-auto px-4 sm:px-6 pb-10'>
         {/* Loading */}
-        {loading && (
-          <div className='flex items-center justify-center py-20'>
-            <div className='text-center'>
-              <div className='w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4'></div>
-              <p className='text-gray-500 text-sm'>Loading your listings...</p>
-            </div>
-          </div>
-        )}
+        {loading && <MyListingGridSkeleton count={6} />}
 
         {/* Empty State */}
         {!loading && listings.length === 0 && (
@@ -223,7 +217,7 @@ export default function MyListings() {
                   onClick={() => { handleClearSearch(); setTypeFilter('all'); }}
                   className='text-sm font-semibold text-teal-600 hover:text-teal-700 transition-colors'
                 >
-                  Clear All Filters
+                  Clear Filters
                 </button>
               </>
             ) : (
@@ -539,14 +533,7 @@ export default function MyListings() {
 
             {/* Modal Content */}
             <div className='overflow-y-auto max-h-[60vh]'>
-              {loadingLikes && (
-                <div className='flex items-center justify-center py-12'>
-                  <div className='text-center'>
-                    <div className='w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-3'></div>
-                    <p className='text-sm text-gray-400'>Loading...</p>
-                  </div>
-                </div>
-              )}
+              {loadingLikes && <UserListSkeleton count={4} />}
 
               {!loadingLikes && likedByUsers.length === 0 && (
                 <div className='py-12 text-center px-6'>

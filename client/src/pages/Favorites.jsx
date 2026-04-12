@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaHeart, FaHome, FaSearch, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import ListingItem from '../components/ListingItem';
 import toast from 'react-hot-toast';
+import { CardGridSkeleton } from '../components/Skeleton';
 
 export default function Favorites() {
   const [listings, setListings] = useState([]);
@@ -150,14 +151,7 @@ export default function Favorites() {
       {/* Content */}
       <div className='max-w-6xl mx-auto px-4 sm:px-6 pb-10'>
         {/* Loading */}
-        {loading && (
-          <div className='flex items-center justify-center py-20'>
-            <div className='text-center'>
-              <div className='w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4'></div>
-              <p className='text-gray-500 text-sm'>Loading your favorites...</p>
-            </div>
-          </div>
-        )}
+        {loading && <CardGridSkeleton count={8} cols={4} />}
 
         {/* Empty State */}
         {!loading && listings.length === 0 && (
@@ -175,7 +169,7 @@ export default function Favorites() {
                   onClick={() => { handleClearSearch(); setTypeFilter('all'); }}
                   className='text-sm font-semibold text-teal-600 hover:text-teal-700 transition-colors'
                 >
-                  Clear All Filters
+                  Clear Filters
                 </button>
               </>
             ) : (

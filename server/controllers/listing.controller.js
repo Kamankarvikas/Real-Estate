@@ -98,8 +98,10 @@ export const getListing=async(req,res,next)=>{
 
 export const getListings = async (req, res, next) => {
   try {
-    const limit = parseInt(req.query.limit) || 9;
-    const startIndex = parseInt(req.query.startIndex) || 0;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+    const skip = (page - 1) * pageSize;
+
     let offer = req.query.offer;
 
     if (offer === undefined || offer === 'false') {
@@ -130,16 +132,20 @@ export const getListings = async (req, res, next) => {
 
     const order = req.query.order || 'desc';
 
-    const listings = await Listing.find({
+    const query = {
       name: { $regex: searchTerm, $options: 'i' },
       offer,
       furnished,
       parking,
       type,
-    })
+    };
+
+    const total = await Listing.countDocuments(query);
+
+    const listings = await Listing.find(query)
       .sort({ [sort]: order })
-      .limit(limit)
-      .skip(startIndex)
+      .limit(pageSize)
+      .skip(skip)
       .lean();
 
     // Attach favorited flag if user is logged in
@@ -160,7 +166,13 @@ export const getListings = async (req, res, next) => {
       });
     }
 
-    return res.status(200).json(listings);
+    return res.status(200).json({
+      listings,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    });
   } catch (error) {
     next(error);
   }

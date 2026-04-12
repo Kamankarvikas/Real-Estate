@@ -6,6 +6,7 @@ import SwiperCore from 'swiper';
 import { useSelector } from 'react-redux';
 import { Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css/bundle';
+import { ListingDetailSkeleton } from '../components/Skeleton';
 import {
   FaBath,
   FaBed,
@@ -91,14 +92,7 @@ export default function Listing() {
 
   return (
     <main className='bg-gray-50 min-h-screen'>
-      {loading && (
-        <div className='flex items-center justify-center py-20'>
-          <div className='text-center'>
-            <div className='w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4'></div>
-            <p className='text-gray-500 text-sm'>Loading property details...</p>
-          </div>
-        </div>
-      )}
+      {loading && <ListingDetailSkeleton />}
       {error && (
         <div className='flex items-center justify-center py-20'>
           <div className='text-center'>
@@ -156,9 +150,14 @@ export default function Listing() {
                   <button
                     onClick={handleFavoriteToggle}
                     disabled={toggling}
-                    className='w-9 h-9 rounded-full border border-gray-200 hover:bg-red-50 flex items-center justify-center transition-colors disabled:opacity-50'
+                    className='w-9 h-9 rounded-full border border-gray-200 hover:bg-red-50 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
                   >
-                    {favorited ? (
+                    {toggling ? (
+                      <svg className='animate-spin h-4 w-4 text-teal-500' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
+                        <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4'></circle>
+                        <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z'></path>
+                      </svg>
+                    ) : favorited ? (
                       <FaHeart className='text-red-500 text-base' />
                     ) : (
                       <FaRegHeart className='text-gray-400 text-base' />

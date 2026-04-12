@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { EditFormSkeleton } from '../components/Skeleton';
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
@@ -198,12 +199,7 @@ export default function CreateListing() {
         </div>
 
         {fetchingData ? (
-          <div className='flex items-center justify-center py-32'>
-            <div className='text-center'>
-              <div className='w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4'></div>
-              <p className='text-gray-500 text-sm'>Loading listing data...</p>
-            </div>
-          </div>
+          <EditFormSkeleton />
         ) : (
         <form onSubmit={handleSubmit} className='grid lg:grid-cols-5 gap-6'>
           {/* Left - Property Details */}
