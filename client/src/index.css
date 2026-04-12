@@ -8,20 +8,28 @@ body {
 }
 
 /* Marquee animation (maintenance banner) */
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-33.3333%); }
+.marquee-wrapper {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
 }
-.animate-marquee {
-  animation: marquee 5s linear infinite;
+.marquee-track {
+  display: flex;
+  flex-shrink: 0;
+  min-width: 100%;
+  animation: marquee 20s linear infinite;
   will-change: transform;
 }
-.animate-marquee:hover {
+.marquee-track:hover {
   animation-play-state: paused;
 }
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
 @media (max-width: 768px) {
-  .animate-marquee {
-    animation-duration: 1.8s;
+  .marquee-track {
+    animation-duration: 15s;
   }
 }
 
