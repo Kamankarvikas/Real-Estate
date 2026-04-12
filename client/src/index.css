@@ -7,6 +7,24 @@ body {
   font-family: 'Poppins', system-ui, -apple-system, sans-serif;
 }
 
+/* Marquee animation (maintenance banner) */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.3333%); }
+}
+.animate-marquee {
+  animation: marquee 5s linear infinite;
+  will-change: transform;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+@media (max-width: 768px) {
+  .animate-marquee {
+    animation-duration: 1.8s;
+  }
+}
+
 /* Typing animation */
 @keyframes typing {
   from { max-width: 0 }
